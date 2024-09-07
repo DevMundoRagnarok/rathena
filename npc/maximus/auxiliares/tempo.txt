@@ -1,0 +1,27 @@
+-	script	Day_Check	-1,{
+	end;
+
+OnClock1800:
+OnClock0600:
+
+OnInit:
+	if ((gettime(DT_HOUR)>=06 && gettime(DT_HOUR)<18)) {
+		goto dia;
+		end;
+	}
+	if ((gettime(DT_HOUR)>=18 && gettime(DT_HOUR)<6)) {
+		goto noite;
+		end;
+	}
+
+noite:
+	night;
+	announce "Anoitece e os habitantes de Rune-Midgard retornam para suas casas...",0;
+	soundeffectall "se_wolf1.wav",0;
+	end;
+dia:
+	day;
+	announce "O Sol se levanta sobre toda Rune-Midgard...",0;
+	soundeffectall "se_cock_02.wav",0;
+	end;
+}

@@ -1,0 +1,29 @@
+//===== rAthena Script =======================================
+//= Chance de drop de Moeda Poring ao matar monstros
+//===== Autor: ==============================================
+//= Millenium
+//===== Descrição: ==========================================
+//= Este script concede uma chance de 10% para qualquer monstro morto
+//= dropar uma "Moeda Poring" (ID do item: 7539) para o jogador.
+//===========================================================
+
+-	script	poring_coin_drop	-1,{
+	OnNPCKillEvent: // Evento ativado ao matar qualquer monstro.
+		// Defina a chance de 10% (1 em 10).
+		if (rand(100) < 100) {
+			// ID do item Moeda Poring (7539), ajusta se necessário.
+			.@poring_coin = 7539;
+			// Adiciona 1 Moeda Poring ao jogador.
+			getitem .@poring_coin, 1;
+			// Mensagem para o jogador que ganhou a moeda.
+			dispbottom "Você ganhou 1 Moeda Poring!";
+		}
+		end;
+}
+
+
+//1% de chance: Usar rand(100) < 1. Isso gera um número entre 0 e 99. Se o número gerado for 0, o jogador recebe o item (1% de chance).
+//5% de chance: Usar rand(100) < 5. Isso significa que o número gerado deve ser entre 0 e 4. Portanto, o jogador tem uma chance de 5% de receber o item.
+//10% de chance: Usar rand(100) < 10. O número gerado será de 0 a 99, e se for de 0 a 9, o jogador recebe o item (10% de chance).
+//50% de chance: Usar rand(100) < 50. Isso permite que o jogador tenha 50% de chance de ganhar o item, já que qualquer número de 0 a 49 resultará no drop.
+//100% de chance: Usar rand(100) < 100. Isso garante que o jogador sempre receberá o item, já que qualquer número de 0 a 99 será considerado.
