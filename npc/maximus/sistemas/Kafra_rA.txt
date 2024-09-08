@@ -1,0 +1,2237 @@
+//===== RSM Mod Script =======================================
+//= Funcionária Kafra VIP
+//===== Por: =================================================
+//= RomuloSM (sbk_)
+//===== Versao Atual: ========================================
+//= 1.0
+//===== Compativel com: ======================================
+//= rAthena RSM Mod
+//===== Descrição: ===========================================
+//= Funcionária Kafra configurável.
+//===== Comentarios Adicional: ===============================
+//= 1.0 Primeira versao.[RomuloSM]
+//===== Contato: =============================================
+//= Email: romulodevel@gmail.com
+//= Facebook: https://www.facebook.com/RomuloDevel
+//============================================================
+
+// [NOTA1]: 0 desabilita esta opção.
+// [NOTA2]: Emuladores Hercules Suporta 333.333.332 VALORES, rAthena mais recentes 1bi e emuladores com base no eAthena suporta apenas 42 valores.
+// [NOTA3]: Deixe em branco para desabilitar esta opção.
+// [NOTA4]: Para desativar funções secundárias de prevenções, ponha 0 na variável .@Stylist_Enable que geralmente se encontra na linha 3292.
+//
+// [GROUPID]: É o Level de Previlégio do Jogador.
+//
+-	script	Atendente_VIP	-1,{
+	// -----------------------------------------------
+	// -			Configurações Globais		 	 -
+	// -----------------------------------------------
+	
+	// Site no qual será indicado ao jogador para se tornar um Usuário VIP.
+	.@WebSite$ = "http://creativesd.com.br";
+	
+	// Nível de Jogadores Comuns.
+	.@MinGroupID = 0;
+	
+	// Cutin a ser Exibido
+	.@cutin$ = "katsua01";	// [NOTA3]
+	
+	// -------------------------------------------------
+
+	// -----------------------------------------------
+	// -		Configurações de Permissões			 -
+	// -----------------------------------------------
+	setarray .@EnableMenus[0],
+				0, 1,	// Habilitar Armazém? [NOTA1],[GROUPID]
+				0, 1,	// Habilitar Armazém do Clã? [NOTA1],[GROUPID]
+				0, 1,	// Habilitar Encantamentos? [NOTA1],[GROUPID]		
+				1, 1,	// Habilitar Estilista? [NOTA1],[GROUPID] (Funções Secundárias [NOTA4])
+				1, 1,	// Habilitar Mudança de Mestre do Clã? [NOTA1],[GROUPID]
+				1, 1,	// Habilitar Removedora de Cartas? [NOTA2],[GROUPID]
+				1, 1,	// Habilitar Reparador de Itens? [NOTA1],[GROUPID]
+				1, 1,	// Habilitar Resetadora de Pontos Atributos? [NOTA1],[GROUPID]
+				1, 1,	// Habilitar Resetadora de Pontos Habilidades? [NOTA1],[GROUPID]
+				0, 1,	// Salvar Ponto Atual? [NOTA1],[GROUPID]
+				1, 1,	// Habilitar Encantar Arma? [NOTA1],[GROUPID]
+				1, 1,	// Habilitar Arena MVP? [NOTA1],[GROUPID]
+				1, 1	// Habilitar Torpedo? [NOTA1],[GROUPID]
+	;
+	
+	// -----------------------------------------------
+	// -		Configurações do Armazém		 	 -
+	// -----------------------------------------------
+	
+	// Preço que será cobrado no Armazém.
+	.@StorageCost = 0;	// [NOTA1]
+	
+	// Habilitar a checagem de Habilidades Básicas?
+	.@StorageSkill = 1;		// [NOTA1]
+	
+	// -----------------------------------------------
+	// -     Configurações do Armazém do Clã		 -
+	// -----------------------------------------------
+	
+	// Preço que será cobrado no Armazém.
+	.@gStorageCost = 0;	// [NOTA1]
+	
+	// -----------------------------------------------
+	// -		Configurações de Encantamentos		 -
+	// -----------------------------------------------
+	
+	// Preço que será cobrado no encantamento.
+	.@EnchantmentCost = 0;
+	
+	// Encantamentos que serão dado para o jogador.
+	//
+	//	Ex:
+	//		setarray .@EnchantmentList[0], Encatamento 1, Efeito Especial 1, Duração 1, Encatamento 2, Efeito Especial 2, Duração 2;
+	//
+	//	O Efeito especial pode 
+	//
+	//	A duração deve ser posta em milisegundos.
+	//
+	setarray .@EnchantmentList[0],	// [NOTA2]
+				SC_BLESSING, EF_BLESSING, 600000,
+				SC_INCREASEAGI, EF_INCAGILITY, 600000,
+				SC_IMPOSITIO, EF_IMPOSITIO, 600000,
+				SC_MAGNIFICAT, EF_MAGNIFICAT, 600000,
+				SC_GLORIA, EF_GLORIA, 600000,
+				SC_MAXIMIZEPOWER, EF_MAXPOWER, 600000
+	;
+	
+	// Habilitar o Reparamento de todos os itens ao receber os buffs?
+	.@EnchantmentRepair = 1;		// [NOTA1]
+	
+	// -----------------------------------------------
+	// -		Configurações do Estilista		 	 -
+	// -----------------------------------------------
+	
+	// Preço que será cobrado em serviços de Estilista.
+	setarray .@StylistCost[0],	// [NOTA1]
+				0,				// Cor da Roupa
+				0,				// Cor do Cabelo
+				0				// Estilo do Cabelo
+	;
+	
+	// Limite de cores de roupas para 1ª Classe.
+	setarray .@Stylist_1rdjob_clother[0], 0, 700; // [INICIA,TERMINA]
+
+	// Limite de estilo de cabelo para 1ª Classes. 
+	setarray .@Stylist_1rdjob_hair_style[0], 0, 42; 	// [INICIA,TERMINA]
+	
+	// Limite de cores de cabelo para 1ª Classes. 
+	setarray .@Stylist_1rdjob_hair_color[0], 0, 127; 	// [INICIA,TERMINA]
+
+	// Limite de cores de roupas para 2ª&Avançadas Classe. 
+	setarray .@Stylist_2rdjob_clother[0], 0, 700; 		// [INICIA,TERMINA]
+	
+	// Limite de estilo de cabelo para 2ª Classes&Avançadas Classe. 
+	setarray .@Stylist_2rdjob_hair_style[0], 0, 42; 	// [INICIA,TERMINA]
+	
+	// Limite de cores de cabelo para 2ª Classes&Avançadas Classe. 
+	setarray .@Stylist_2rdjob_hair_color[0], 0, 127; 	// [INICIA,TERMINA]
+	
+	// Limite de cores de roupas para Classes extendidas. 
+	setarray .@Stylist_extjob_clother[0], 0, 700; 		// [INICIA,TERMINA]
+	
+	// Limite de estilo de cabelo para Classes extendidas. 
+	setarray .@Stylist_extjob_hair_style[0], 0, 42; 	// [INICIA,TERMINA]
+	
+	// Limite de cores de cabelo para Classes extendidas. 
+	setarray .@Stylist_extjob_hair_color[0], 0, 127; 	// [INICIA,TERMINA]
+	
+	// Limite de cores de roupas para Transclasses. 
+	setarray .@Stylist_transjob_clother[0], 0, 700;		// [INICIA,TERMINA]
+	
+	// Limite de estilo de cabelo para Transclasses. 
+	setarray .@Stylist_transjob_hair_style[0], 0, 42;	// [INICIA,TERMINA]
+	
+	// Limite de cores de cabelo para Transclasses. 
+	setarray .@Stylist_transjob_hair_color[0], 0, 127;	// [INICIA,TERMINA]
+	
+	// Limite de cores de roupas para 3ª Classes. 
+	setarray .@Stylist_3rdjob_clother[0], 0, 3;			// [INICIA,TERMINA]
+	
+	// Limite de estilo de cabelo para 3ª Classes. 
+	setarray .@Stylist_3rdjob_hair_style[0], 0, 43;		// [INICIA,TERMINA]
+	
+	// Limite de cores de cabelo para Transclasses. 
+	setarray .@Stylist_3rdjob_hair_color[0], 0, 251;	// [INICIA,TERMINA]
+	
+	// Limite de cores de roupas para Evoluções de Classes extendidas. 
+	setarray .@Stylist_evextjob_clother[0], 0, 3;		// [INICIA,TERMINA]
+	
+	// Limite de estilo de cabelo para Evoluções de Classes extendidas. 
+	setarray .@Stylist_evextjob_hair_style[0], 0, 43;	// [INICIA,TERMINA]
+	
+	// Limite de cores de cabelo para Transclasses. 
+	setarray .@Stylist_evextjob_hair_color[0], 0, 251;	// [INICIA,TERMINA]
+	
+	// -----------------------------------------------
+	// -  Configurações da Mudança de Mestre do Clã  -
+	// -----------------------------------------------
+	
+	// Preço que será cobrado para mudar o Mestre do Clã.
+	.@ChangeGMCost = 0;				// [NOTA1]
+	
+	// -----------------------------------------------
+	// -	Configurações do Removedor de Carta		 -
+	// -----------------------------------------------
+	
+	// Preço que será cobrado para cada carta removida.
+	.@RemoveCardCost = 0;			// [NOTA1]
+	
+	// Devolver as cartas removidas do jogador?
+	.@RemoveCardReturn = 0;			// [NOTA1]
+	
+	// -----------------------------------------------
+	// -  Configurações do Reparador de Equipamento	 -
+	// -----------------------------------------------
+	
+	// Preço que será cobrado para reparar um equipamento.
+	.@RepairCost = 0;				// [NOTA1]
+	
+	// -----------------------------------------------
+	// -   Configurações do Resetador de Atributos 	 -
+	// -----------------------------------------------
+	
+	// Preço que será cobrado para resetar os atributos.
+	.@ResetStatusCost = 0;		// [NOTA1]
+	
+	// Nível de Base exibido para resetar os atributos.
+	.@ResetStatusBase = 0;			// [NOTA1]
+	
+	// Exigir que o jogador distribua todos os pontos de atributos?
+	.@ResetStatusPoint = 0;			// [NOTA1]
+	
+	// -----------------------------------------------
+	// - Configurações do Resetador de Habilidades 	 -
+	// -----------------------------------------------
+	
+	// Preço que será cobrado para resetar as habilidades.
+	.@ResetSkillCost = 0;			// [NOTA1]
+	
+	// Nível de Base exibido para resetar as habilidades.
+	.@ResetSkillJob = 0;			// [NOTA1]
+	
+	// Exigir que o jogador distribua todos as habilidades?
+	.@ResetSkillPoint = 0;			// [NOTA1]
+	
+	// -----------------------------------------------
+	// - Configurações do Salvar Ponto Atual 	 	 -
+	// -----------------------------------------------
+	
+	// Preço que será cobrado para Salvar o Ponto Atual.
+	.@SavePointCost = 0;			// [NOTA1]
+	
+	// -----------------------------------------------
+	// - 		Configurações do Teleporte 	 		 -
+	// -----------------------------------------------
+	
+	// Preço que será cobrado no teleporte.
+	setarray .@TeleportCost[0],	// [NOTA 1]
+				0,		// Cidades
+				0,		// Campos
+				0,		// Calabouços
+				0,		// Castelos da Guerra do Emperium Primeira Edição
+				0		// Castelos da Guerra do Emperium Segunda Edição
+	;
+				
+	
+	// -----------------------------------------------
+	// - 		Ínicio da Funcionária Kafra 	 	-
+	// -----------------------------------------------
+	if( checkre(0) )
+		.@re = 1;
+	else
+		.@re = 0;
+
+	.@loop_1 = 1;
+	while(.@loop_1)
+	{
+		if( .@cutin$ != "" )
+			cutin .@cutin$, 2;
+		
+		mes "^FFA500[Atendente VIP]^000000";
+		mes (gettime(3)>= 6&&gettime(3)<= 12?"Bom-dia":(gettime(3)>=13&&gettime(3)<=18?"Boa-tarde":"Boa-noite"))+", ^008aff"+strcharinfo(0)+"^000000 !";
+		if( getgroupid() <= .@MinGroupID )
+		{
+			mes "Ainda não é um Usuário VIP? Para se tornar um usuário VIP, acesse nosso site:";
+			mes "^0000FF" + .@WebSite$ + "^000000";
+			close2;
+			cutin "", 255;
+			end;
+		}
+		if( getgroupid() == 1 )
+		{
+		mes "Seu acesso VIP expira em:";
+		mes	"^008aff" + callfunc("Time2Str",vip_status(2)) + ".^000000";
+		}
+		mes "Em que posso ajudar?";
+		next;
+		switch( select(
+					(.@EnableMenus[0]&&getgroupid()>=.@EnableMenus[1]?"- Armazém.":""),
+					(.@EnableMenus[2]&&getgroupid()>=.@EnableMenus[3]&&getcharid(2)?"- Armazém do Clã.":""),
+					(.@EnableMenus[4]&&getgroupid()>=.@EnableMenus[5]?"- Encantamentos.":""),
+					(.@EnableMenus[6]&&getgroupid()>=.@EnableMenus[7]?"- Estilista.":""),
+					(.@EnableMenus[8]&&getgroupid()>=.@EnableMenus[9]&&getcharid(2)&&getcharid(0)==getguildmasterid(getcharid(2))?"- Mudar Mestre do Clã.":""),
+					(.@EnableMenus[10]&&getgroupid()>=.@EnableMenus[11]?"- Remover Cartas.":""),
+					(.@EnableMenus[12]&&getgroupid()>=.@EnableMenus[13]?"- Reparar Equipamentos.":""),
+					(.@EnableMenus[14]&&getgroupid()>=.@EnableMenus[15]?"- Resetar Atributos.":""),
+					(.@EnableMenus[16]&&getgroupid()>=.@EnableMenus[17]?"- Resetar Habilidades.":""),
+					(.@EnableMenus[18]&&getgroupid()>=.@EnableMenus[19]?"- Salvar Ponto Atual.":""),
+					(.@EnableMenus[20]&&getgroupid()>=.@EnableMenus[21]?"- Encantar Arma.":""),
+					(.@EnableMenus[22]&&getgroupid()>=.@EnableMenus[23]?"- Arena MVP.":""),
+					(.@EnableMenus[24]&&getgroupid()>=.@EnableMenus[25]?"- Torpedo.":""),
+					"^FF0000- Saír.^000000"
+				)
+		)
+		{
+			// Armazém
+			case 1:
+				if( .@StorageSkill && basicskillcheck() && getskilllv("NV_BASIC") < 6 )
+				{
+					mes "^FFA500[Atendente VIP]^000000";
+					mes "Para abrir o ^0000FFArmazém^000000 é necessário ter o ^FF0000Nível 6 de habilidades Básicas^000000.";
+					next;
+					break;
+				}
+				
+				if( .@StorageCost )
+				{
+					mes "^FFA500[Atendente VIP]^000000";
+					mes "Para abrir o ^0000FFArmazém^000000 é necessário ^FF0000" + .@StorageCost + " Zenys^000000.";
+					if( Zeny < .@StorageCost )
+					{
+						mes "^FF0000Você não tem o Zeny requirido.^000000";
+						next;
+						break;
+					}
+				}
+				mes "Deseja abrir o ^0000FFArmazém^000000?";
+				next;
+				if( select("- Sim, abrir Armazém.", "^FF0000- Não, obrigado.^000000") == 2 )
+					break;
+				
+				if( .@StorageCost )
+					Zeny -= .@StorageCost;
+					
+				mes "^FFA500[Atendente VIP]^000000";
+				mes "Muito bem, vou abrir seu ^0000FFArmazém^000000.";
+				close2;
+				cutin "", 255;
+				openstorage;
+				end;
+			// Armazém do Clã
+			case 2:
+				if( .@gStorageCost )
+				{
+					mes "^FFA500[Atendente VIP]^000000";
+					mes "Para abrir o ^0000FFArmazém do Clã^000000 é necessário ^FF0000" + .@gStorageCost + " Zenys^000000.";
+					if( Zeny < .@gStorageCost )
+					{
+						mes "^FF0000Você não tem o Zeny requirido.^000000";
+						next;
+						break;
+					}
+				}
+				mes "Deseja abrir o ^0000FFArmazém do Clã^000000?";
+				next;
+				if( select("- Sim, abrir Armazém do Clã.", "^FF0000- Não, obrigado.^000000") == 2 )
+					break;
+				
+				if( .@StorageCost )
+					Zeny -= .@gStorageCost;
+					
+				mes "^FFA500[Atendente VIP]^000000";
+				mes "Muito bem, vou abrir seu ^0000FFArmazém do Clã^000000.";
+				close2;
+				cutin "", 255;
+				guildopenstorage;
+				end;
+			// Encantamentos.
+			case 3:
+				if( .@EnchantmentCost )
+				{
+					mes "^FFA500[Atendente VIP]^000000";
+					mes "Para receber os ^0000FFEncantamentos^000000 é necessário ^FF0000" + .@EnchantmentCost + " Zenys^000000.";
+					if( Zeny < .@EnchantmentCost )
+					{
+						mes "^FF0000Você não tem o Zeny requirido.^000000";
+						next;
+						break;
+					}
+					mes "Deseja receber seus ^0000FFEncantamentos^000000?";
+					next;
+					if( select("- Sim, receber Encantamentos.", "^FF0000- Não, obrigado.^000000") == 2 )
+						break;
+						
+					Zeny -= .@EnchantmentCost;
+				}
+				
+				if( .@EnchantmentRepair )
+					repairall;
+					
+				for( .@i=0; .@i < getarraysize(.@EnchantmentList); .@i+=3 )
+				{
+					specialeffect2 .@EnchantmentList[.@i+1];
+					sc_start .@EnchantmentList[.@i], .@EnchantmentList[.@i+2], 10;
+				}
+				
+				percentheal 100,100;
+					
+				mes "^FFA500[Atendente VIP]^000000";
+				mes "Aqui está seus ^0000FFEncantamentos^000000.";
+				close2;
+				cutin "", 255;
+				end;
+				
+			// Estilista
+			case 4:
+				// Esses parametros são para ajustes de acordo com a classe.
+				.@class = eaclass();
+				if( Class < 6 )
+				{
+					.@min_clother = .@Stylist_1rdjob_clother[0];
+					.@max_clother = .@Stylist_1rdjob_clother[1];
+					.@min_hair = .@Stylist_1rdjob_hair_style[0];
+					.@max_hair = .@Stylist_1rdjob_hair_style[1];
+					.@min_haircolor = .@Stylist_1rdjob_hair_color[0];
+					.@max_haircolor = .@Stylist_1rdjob_hair_color[1];
+				}
+				else if( Class >= 23 && Class <= 25 || Class >= 4045 && Class <= 4049 )
+				{
+					.@min_clother = .@Stylist_extjob_clother[0];
+					.@max_clother = .@Stylist_extjob_clother[1];
+					.@min_hair = .@Stylist_extjob_hair_style[0];
+					.@max_hair = .@Stylist_extjob_hair_style[1];
+					.@min_haircolor = .@Stylist_extjob_hair_color[0];
+					.@max_haircolor = .@Stylist_extjob_hair_color[1];
+				}
+				else if( Class >= 4211 && Class <= 4215 )
+				{
+					.@min_clother = .@Stylist_evextjob_clother[0];
+					.@max_clother = .@Stylist_evextjob_clother[1];
+					.@min_hair = .@Stylist_evextjob_hair_style[0];
+					.@max_hair = .@Stylist_evextjob_hair_style[1];
+					.@min_haircolor = .@Stylist_evextjob_hair_color[0];
+					.@max_haircolor = .@Stylist_evextjob_hair_color[1];
+				}
+				else if( .@class&EAJL_THIRD )
+				{
+					.@min_clother = .@Stylist_3rdjob_clother[0];
+					.@max_clother = .@Stylist_3rdjob_clother[1];
+					.@min_hair = .@Stylist_3rdjob_hair_style[0];
+					.@max_hair = .@Stylist_3rdjob_hair_style[1];
+					.@min_haircolor = .@Stylist_3rdjob_hair_color[0];
+					.@max_haircolor = .@Stylist_3rdjob_hair_color[1];
+				}
+				else if( Class != 23 && Class != 4045 &&.@class&EAJL_2 )
+				{
+					.@min_clother = .@Stylist_2rdjob_clother[0];
+					.@max_clother = .@Stylist_2rdjob_clother[1];
+					.@min_hair = .@Stylist_2rdjob_hair_style[0];
+					.@max_hair = .@Stylist_2rdjob_hair_style[1];
+					.@min_haircolor = .@Stylist_2rdjob_hair_color[0];
+					.@max_haircolor = .@Stylist_2rdjob_hair_color[1];
+				}
+				else if( .@class&EAJ_UPPERMASK )
+				{
+					.@min_clother = .@Stylist_transjob_clother[0];
+					.@max_clother = .@Stylist_transjob_clother[1];
+					.@min_hair = .@Stylist_transjob_hair_style[0];
+					.@max_hair = .@Stylist_transjob_hair_style[1];
+					.@min_haircolor = .@Stylist_transjob_hair_color[0];
+					.@max_haircolor = .@Stylist_transjob_hair_color[1];
+				}
+				else {
+					.@min_clother = .@Stylist_3rdjob_clother[0];
+					.@max_clother = .@Stylist_3rdjob_clother[1];
+					.@min_hair = .@Stylist_3rdjob_hair_style[0];
+					.@max_hair = .@Stylist_3rdjob_hair_style[1];
+					.@min_haircolor = .@Stylist_3rdjob_hair_color[0];
+					.@max_haircolor = .@Stylist_3rdjob_hair_color[1];
+				}
+				
+				mes "^FFA500[Atendente VIP]^000000";
+				mes "Em qual visual você deseja modificar?";
+				next;
+				switch( select("- Cor da Roupa.", "- Cor do Cabelo.", "- Estilo do Cabelo.", "^FF0000- Cancelar.^000000") )
+				{
+					case 1:
+						.@last = clother_color;
+						.@loop_2 = 1;
+						while(.@loop_2)
+						{
+							mes "^FFA500[Atendente VIP]^000000";
+							mes "Muito bem, a cor da sua roupa atual é ^0000FFestilo número " + (.@last+1) + "^000000.";
+							mes "Como você desejar tingir sua roupa?";
+							next;
+							switch( select("^0000FF- Digitar o número da Cor da Roupa.^000000", "^0000FF- Ver um por vez.^000000", "^FF0000- Cancelar.^000000") )
+							{
+								case 1:
+									.@loop_3 = 1;
+									while(.@loop_3)
+									{
+										mes "^FFA500[Atendente VIP]^000000";
+										mes "Por favor, digite um número de uma cor entre ^0000FF" + (.@min_clother+1) + "~" + (.@max_clother+1) + "^000000.";
+										mes "^FF0000Se você digitar '0' você irá cancelar esta operação.^000000";
+										next;
+										input .@color;
+										if( !.@color )
+										{
+											.@loop_3 = 0;
+											break;
+										}
+										else if( .@color > (.@max_clother+1) )
+										{
+											mes "^FFA500[Atendente VIP]^000000";
+											mes "Você tem que digitar um número de uma cor entre ^0000FF" + (.@min_clother+1) + "~" + (.@max_clother+1) + "^000000.";
+											mes "^0000FFSe você digitar '0' você irá cancelar esta operação.^000000";
+											next;
+										}
+										else {
+											.@set = .@color-1;
+											setlook 7, .@set;
+											mes "^FFA500[Atendente VIP]^000000";
+											mes "Veja como o ^0000FFestilo número " + .@color + "^000000 fico nas suas roupas, deseja manter ela?";
+											next;
+											switch( prompt("^0000FF- Digitar outra cor.", "^006400- Manter essa.^000000", "^FF0000- Cancelar.^000000") )
+											{
+												case 1:
+													break;
+												case 2:
+													if( .@StylistCost[0] )
+													{
+														mes "^FFA500[Atendente VIP]^000000";
+														mes "Para mudar a ^0000FFCor da sua Roupa^000000 é necessário ^FF0000" + .@StylistCost[0] + " Zenys^000000.";
+														if( Zeny < .@StylistCost[0] )
+														{
+															setlook 7, .@last;
+															mes "^FF0000Você não tem o Zeny requirido.^000000";
+															next;
+															.@loop_3 = 0;
+															.@loop_2 = 0;
+															break;
+														}
+														mes "Tem certeza que deseja manter esta cor de Roupa?";
+														next;
+														if( select("- Sim, manter cor da roupa.", "^FF0000- Cancelar.^000000") == 2 )
+														{
+															setlook 7, .@last;
+															.@loop_3 = 0;
+															.@loop_2 = 0;
+															break;
+														}
+														
+														
+														Zeny -= .@StylistCost[0];
+													}
+													
+													clother_color = .@set;
+													.@loop_3 = 0;
+													mes "^FFA500[Atendente VIP]^000000";
+													mes "Muito bem, a ^0000FFCor da Sua Roupa^000000 foi atualizada com sucesso.";
+													close2;
+													cutin "", 255;
+													end;
+												case 3:
+													setlook 7, .@last;
+													.@loop_3 = 0;
+													break;
+												default:
+													setlook 7, .@last;
+													.@loop_3 = 0;
+													.@loop_2 = 0;
+													break;
+											}
+										}
+									}
+									break;
+								case 2:
+									.@last = clother_color;
+									.@progress = .@last;
+									.@loop_3 = 1;
+									while(.@loop_3)
+									{
+										setlook 7, .@progress;
+										mes "^FFA500[Atendente VIP]^000000";;
+										mes "^0000FFEstilo número " + (.@progress+1) + "^000000.";
+										mes "Que tal essa? Deseja manter?";
+										next;
+										switch( prompt("^0000FF- Próximo.^000000", (.@progress>0?"^0000FF- Anterior.^000000":""), "^006400- Manter essa.^000000", "^FF0000- Cancelar.^000000") )
+										{
+											case 1:
+												.@progress = ((.@progress+1)>.@max_clother?0:(.@progress+1));
+												break;
+											case 2:
+												.@progress = .@progress-1;
+												break;
+											case 3:
+												if( .@StylistCost[0] )
+												{
+													mes "^FFA500[Atendente VIP]^000000";
+													mes "Para mudar a ^0000FFCor da sua Roupa^000000 é necessário ^FF0000" + .@StylistCost[0] + " Zenys^000000.";
+													if( Zeny < .@StylistCost[0] )
+													{
+														setlook 7, .@last;
+														mes "^FF0000Você não tem o Zeny requirido.^000000";
+														next;
+														.@loop_3 = 0;
+														.@loop_2 = 0;
+														break;
+													}
+													mes "Tem certeza que deseja manter esta cor de Roupa?";
+													next;
+													if( select("- Sim, manter cor da roupa.", "^FF0000- Cancelar.^000000") == 2 )
+													{
+														setlook 7, .@last;
+														.@loop_3 = 0;
+														.@loop_2 = 0;
+														break;
+													}
+													
+														
+													Zeny -= .@StylistCost[0];
+												}
+													
+												clother_color = .@progress;
+												mes "^FFA500[Atendente VIP]^000000";
+												mes "Muito bem, a ^0000FFCor da Sua Roupa^000000 foi atualizada com sucesso.";
+												close2;
+												cutin "", 255;
+												end;
+											default:
+												setlook 7, .@last;
+												.@loop_3 = 0;
+												.@loop_2 = 0;
+												break;
+										}
+									}
+									break;
+								case 3:
+									.@loop_2 = 0;
+									break;
+							}
+						}
+						break;
+					case 2:
+						.@last = hair_color;
+						.@loop_2 = 1;
+						while(.@loop_2)
+						{
+							mes "^FFA500[Atendente VIP]^000000";
+							mes "Muito bem, a cor do seu cabelo atual é ^0000FFestilo número " + (.@last+1) + "^000000.";
+							mes "Como você desejar tingir seu cabelo?";
+							next;
+							switch( select("^0000FF- Digitar o número da Cor do Cabelo.^000000", "^0000FF- Ver um por vez.^000000", "^FF0000- Cancelar.^000000") )
+							{
+								case 1:
+									.@loop_3 = 1;
+									while(.@loop_3)
+									{
+										mes "^FFA500[Atendente VIP]^000000";
+										mes "Por favor, digite um número de uma cor entre ^0000FF" + (.@min_haircolor+1) + "~" + (.@max_haircolor+1) + "^000000.";
+										mes "^FF0000Se você digitar '0' você irá cancelar esta operação.^000000";
+										next;
+										input .@color;
+										if( !.@color )
+										{
+											.@loop_3 = 0;
+											break;
+										}
+										else if( .@color > (.@max_haircolor+1) )
+										{
+											mes "^FFA500[Atendente VIP]^000000";
+											mes "Você tem que digitar um número de uma cor entre ^0000FF" + (.@min_haircolor+1) + "~" + (.@max_haircolor+1) + "^000000.";
+											mes "^0000FFSe você digitar '0' você irá cancelar esta operação.^000000";
+											next;
+										}
+										else {
+											.@set = .@color-1;
+											setlook 6, .@set;
+											mes "^FFA500[Atendente VIP]^000000";
+											mes "Veja como o ^0000FFestilo número " + .@color + "^000000 fico no seu cabelo, deseja manter ela?";
+											next;
+											switch( prompt("^0000FF- Digitar outra cor.", "^006400- Manter essa.^000000", "^FF0000- Cancelar.^000000") )
+											{
+												case 1:
+													break;
+												case 2:
+													if( .@StylistCost[1] )
+													{
+														mes "^FFA500[Atendente VIP]^000000";
+														mes "Para mudar a ^0000FFCor do seu Cabelo^000000 é necessário ^FF0000" + .@StylistCost[1] + " Zenys^000000.";
+														if( Zeny < .@StylistCost[1] )
+														{
+															setlook 6, .@last;
+															mes "^FF0000Você não tem o Zeny requirido.^000000";
+															next;
+															.@loop_3 = 0;
+															.@loop_2 = 0;
+															break;
+														}
+														mes "Tem certeza que deseja manter esta cor do seu Cabelo?";
+														next;
+														if( select("- Sim, manter cor do cabelo.", "^FF0000- Cancelar.^000000") == 2 )
+														{
+															setlook 6, .@last;
+															.@loop_3 = 0;
+															.@loop_2 = 0;
+															break;
+														}
+														
+														Zeny -= .@StylistCost[1];
+													}
+													
+													hair_color = .@set;
+													mes "^FFA500[Atendente VIP]^000000";
+													mes "Muito bem, a ^0000FFCor do Seu Cabelo^000000 foi atualizada com sucesso.";
+													close2;
+													cutin "", 255;
+													end;
+												default:
+													setlook 6, .@last;
+													.@loop_3 = 0;
+													.@loop_2 = 0;
+													break;
+											}
+										}
+									}
+									break;
+								case 2:
+									.@last = hair_color;
+									.@progress = .@last;
+									.@loop_3 = 1;
+									while(.@loop_3)
+									{
+										setlook 6, .@progress;
+										mes "^FFA500[Atendente VIP]^000000";;
+										mes "^0000FFEstilo número " + (.@progress+1) + "^000000.";
+										mes "Que tal essa? Deseja manter?";
+										next;
+										switch( prompt("^0000FF- Próximo.^000000", (.@progress>0?"^0000FF- Anterior.^000000":""), "^006400- Manter essa.^000000", "^FF0000- Cancelar.^000000") )
+										{
+											case 1:
+												.@progress = ((.@progress+1)>.@max_haircolor?0:(.@progress+1));
+												break;
+											case 2:
+												.@progress = .@progress-1;
+												break;
+											case 3:
+													if( .@StylistCost[1] )
+													{
+														mes "^FFA500[Atendente VIP]^000000";
+														mes "Para mudar a ^0000FFCor do seu Cabelo^000000 é necessário ^FF0000" + .@StylistCost[1] + " Zenys^000000.";
+														if( Zeny < .@StylistCost[1] )
+														{
+															setlook 6, .@last;
+															mes "^FF0000Você não tem o Zeny requirido.^000000";
+															next;
+															.@loop_3 = 0;
+															.@loop_2 = 0;
+															break;
+														}
+														mes "Tem certeza que deseja manter esta cor do seu Cabelo?";
+														next;
+														if( select("- Sim, manter cor do cabelo.", "^FF0000- Cancelar.^000000") == 2 )
+														{
+															setlook 6, .@last;
+															.@loop_3 = 0;
+															.@loop_2 = 0;
+															break;
+														}
+														
+														Zeny -= .@StylistCost[1];
+													}
+													
+													hair_color = .@progress;
+													mes "^FFA500[Atendente VIP]^000000";
+													mes "Muito bem, a ^0000FFCor do Seu Cabelo^000000 foi atualizada com sucesso.";
+													close2;
+													cutin "", 255;
+													end;
+											default:
+												setlook 6, .@last;
+												.@loop_3 = 0;
+												.@loop_2 = 0;
+												break;
+										}
+									}
+									break;
+								default:
+									.@loop_2 = 0;
+									break;
+							}
+						}
+						break;
+					case 3:
+						.@last = hair_style;
+						.@loop_2 = 1;
+						while(.@loop_2)
+						{
+							mes "^FFA500[Atendente VIP]^000000";
+							mes "Muito bem, o seu cabelo atual é ^0000FFestilo número " + (.@last+1) + "^000000.";
+							mes "Como você desejar mudar seu cabelo?";
+							next;
+							switch( select("^0000FF- Digitar o número do Cabelo.^000000", "^0000FF- Ver um por vez.^000000", "^FF0000- Cancelar.^000000") )
+							{
+								case 1:
+									.@loop_3 = 1;
+									while(.@loop_3)
+									{
+										mes "^FFA500[Atendente VIP]^000000";
+										mes "Por favor, digite um número de um estilo de cabelo entre ^0000FF" + (.@min_hair+1) + "~" + (.@max_hair+1) + "^000000.";
+										mes "^FF0000Se você digitar '0' você irá cancelar esta operação.^000000";
+										next;
+										input .@color;
+										if( !.@color )
+										{
+											.@loop_3 = 0;
+											break;
+										}
+										else if( .@color > (.@max_hair+1) )
+										{
+											mes "^FFA500[Atendente VIP]^000000";
+											mes "Você tem que digitar um número de um estilo de cabelo entre ^0000FF" + (.@min_hair+1) + "~" + (.@max_hair+1) + "^000000.";
+											mes "^0000FFSe você digitar '0' você irá cancelar esta operação.^000000";
+											next;
+										}
+										else {
+											.@set = .@color-1;
+											setlook 1, .@set;
+											mes "^FFA500[Atendente VIP]^000000";
+											mes "Veja como o ^0000FFestilo número " + .@color + "^000000 fico no seu cabelo, deseja manter ela?";
+											next;
+											switch( prompt("^0000FF- Digitar outro estilo.", "^006400- Manter essa.^000000", "^FF0000- Cancelar.^000000") )
+											{
+												case 1:
+													break;
+												case 2:
+													if( .@StylistCost[2] )
+													{
+														mes "^FFA500[Atendente VIP]^000000";
+														mes "Para mudar o ^0000FFEstilo do seu Cabelo^000000 é necessário ^FF0000" + .@StylistCost[2] + " Zenys^000000.";
+														if( Zeny < .@StylistCost[2] )
+														{
+															setlook 1, .@last;
+															mes "^FF0000Você não tem o Zeny requirido.^000000";
+															next;
+															.@loop_3 = 0;
+															.@loop_2 = 0;
+															break;
+														}
+														mes "Tem certeza que deseja manter esta o estilo do seu Cabelo?";
+														next;
+														if( select("- Sim, manter estilo do cabelo.", "^FF0000- Cancelar.^000000") == 2 )
+														{
+															setlook 1, .@last;
+															.@loop_3 = 0;
+															.@loop_2 = 0;
+															break;
+														}
+														
+														Zeny -= .@StylistCost[2];
+													}
+													hair_style = .@set;
+													mes "^FFA500[Atendente VIP]^000000";
+													mes "Muito bem, o ^0000FFEstilo do Seu Cabelo^000000 foi atualizada com sucesso.";
+													close2;
+													cutin "", 255;
+													end;
+												default:
+													setlook 1, .@last;
+													.@loop_3 = 0;
+													.@loop_2 = 0;
+													.@loop_1 = 0;
+													break;
+											}
+										}
+									}
+									break;
+								case 2:
+									.@last = hair_style;
+									.@progress = .@last;
+									.@loop_3 = 1;
+									while(.@loop_3)
+									{
+										setlook 1, .@progress;
+										mes "^FFA500[Atendente VIP]^000000";;
+										mes "^0000FFEstilo número " + (.@progress+1) + "^000000.";
+										mes "Que tal esse? Deseja manter?";
+										next;
+										switch( select("^0000FF- Próximo.^000000", (.@progress>0?"^0000FF- Anterior.^000000":""), "^006400- Manter esse.^000000", "^FF0000- Cancelar.^000000") )
+										{
+											case 1:
+												.@progress = ((.@progress+1)>.@max_hair?0:(.@progress+1));
+												break;
+											case 2:
+												.@progress = .@progress-1;
+												break;
+											case 3:
+												if( .@StylistCost[2] )
+												{
+													mes "^FFA500[Atendente VIP]^000000";
+													mes "Para mudar o ^0000FFEstilo do seu Cabelo^000000 é necessário ^FF0000" + .@StylistCost[2] + " Zenys^000000.";
+													if( Zeny < .@StylistCost[2] )
+													{
+														setlook 1, .@last;
+														mes "^FF0000Você não tem o Zeny requirido.^000000";
+														next;
+														.@loop_3 = 0;
+														.@loop_2 = 0;
+														break;
+													}
+													mes "Tem certeza que deseja manter esta o estilo do seu Cabelo?";
+													next;
+													if( select("- Sim, manter estilo do cabelo.", "^FF0000- Cancelar.^000000") == 2 )
+													{
+														setlook 1, .@last;
+														.@loop_3 = 0;
+														.@loop_2 = 0;
+														break;
+													}
+													
+													Zeny -= .@StylistCost[2];
+												}
+												hair_style = .@progress;
+												mes "^FFA500[Atendente VIP]^000000";
+												mes "Muito bem, o ^0000FFEstilo do Seu Cabelo^000000 foi atualizada com sucesso.";
+												close2;
+												cutin "", 255;
+												end;
+											default:
+												setlook 1, .@last;
+												.@loop_3 = 0;
+												.@loop_2 = 0;
+												.@loop_1 = 0;
+												break;
+										}
+									}
+									break;
+								default:
+									.@loop_2 = 0;
+									break;
+							}
+						}
+						break;
+					default:
+						break;
+				}
+				break;
+			// Mudar Mestre do Clã
+			case 5:
+				.@loop_2 = 1;
+				while(.@loop_2)
+				{
+					mes "^FFA500[Atendente VIP]^000000";
+					mes "Por favor digite o nome do jogador que esteja na mesmo Clã que você para ^0000FFMudar o Mestre do Clã^000000.";
+					mes "^0000FFÉ necessário que ele esteja online.^000000";
+					mes "^FF0000Digite 0 para esta operação ser cancelada.^000000.";
+					next;
+					input .@name$;
+					
+					if( .@name$ == "0" )
+						break;
+					
+					deletearray .@char_id[0],getarraysize(.@char_id);
+					query_sql "SELECT `char_id`, `name`, `guild_id`, `online` FROM `char` WHERE `name`='" + .@name$ + "'", .@char_id, .@name$, .@guild_id, .@online;
+					
+					if( !getarraysize(.@char_id) )
+					{
+						mes "^FFA500[Atendente VIP]^000000";
+						mes "Este jogador não foi encontrado, tente novamente.";
+						next;
+					}
+					else if( .@guild_id != getcharid(2) )
+					{
+						mes "^FFA500[Atendente VIP]^000000";
+						mes "Este jogador não participa do seu Clã, tente um outro.";
+						next;
+					}
+					else if( !.@online )
+					{
+						mes "^FFA500[Atendente VIP]^000000";
+						mes "Este jogador encontra-se off-line, tente um outro.";
+						next;
+					}
+					else {
+						mes "^FFA500[Atendente VIP]^000000";
+						if( .@ChangeGMCost )
+						{
+							mes "Para mudar o ^0000FFMestre do Clã^000000 é necessário ter ^FF0000" + .@ChangeGMCost + "^000000.";
+							if( Zeny < .@ChangeGMCost )
+							{
+								mes "^FF0000Você não tem o Zeny requirido.^000000";
+								next;
+								.@loop_2 = 0;
+								break;
+							}
+						}
+						mes "Deseja mudar o ^0000FFMestre do Clã^000000 para o Jogador ^FF0000" + .@name$ + "^000000?";
+						next;
+						if( select("- Sim, por favor.", "^FF0000- Cancelar.^000000") == 2 )
+						{
+							.@loop_2 = 0;
+							break;
+						}
+						
+						mes "^FFA500[Atendente VIP]^000000";
+						.@GID = getcharid(2);
+						.@change = guildchangegm(getcharid(2), .@name$[0]);
+						if( .@change )
+						{
+							if( .@ChangeGMCost )
+								Zeny -= .@ChangeGMCost;
+							
+							mes "Muito bem, o ^0000FFMestre do Clã " + getguildname(getcharid(2)) + "^000000 foi alterado com sucesso.";
+							close2;
+							cutin "", 255;
+							end;
+						}
+						mes "Houve um erro ao mudar o ^0000FFMestre do Clã " + getguildname(getcharid(2)) + "^000000, tente novamente.";
+						next;
+					}
+				}
+				break;
+			// Remover Cartas
+			case 6:
+				.@loop_2 = 1;
+				while(.@loop_2)
+				{
+					disable_items;
+					mes "[Removedora de Cartas]";
+					mes "Bom dia, meu jovem. Eu tenho a habilidade de remover cartas já colocadas em seus equipamentos.";
+					mes "Gostaria de remover cartas de seus equipamentos?";
+					next;
+					switch(select("Sim, eu quero!.:Não, Obrigado.")) {
+					case 1:
+						mes "[Removedora de Cartas]";
+						mes "Muito bem. Qual item devo examinar para você?";
+						next;
+
+						setarray .@indices[1], EQI_HEAD_TOP, EQI_ARMOR, EQI_HAND_L, EQI_HAND_R, EQI_GARMENT, EQI_SHOES, EQI_ACC_L, EQI_ACC_R, EQI_HEAD_MID, EQI_HEAD_LOW;
+						for( set .@i,1; .@i <= 10; set .@i,.@i+1 ) {
+							if( getequipisequiped(.@indices[.@i]) )
+								set .@menu$, .@menu$ + F_getpositionname(.@indices[.@i]) + "-[" + getequipname(.@indices[.@i]) + "]";
+							set .@menu$, .@menu$ + ":";
+						}
+						set .@part, .@indices[ select(.@menu$) ];
+						if(!getequipisequiped(.@part)) {
+							mes "[Removedora de Cartas]";
+							mes "Meu jovem... Você não está equipado com nenhum item deste tipo.";
+							close;
+						}
+						if(getequipcardcnt(.@part) == 0) {
+							mes "[Removedora de Cartas]";
+							mes "Meu jovem... Nenhuma carta foi colocada neste item. Não posso fazer nada com isto.";
+							close;
+						}
+						set .@cardcount,getequipcardcnt(.@part);
+
+						if (!checkweight(1202,(.@cardcount+1))) { 
+							mes "^3355FFAguarde um minuto!";
+							mes "Não posso lhe oferecer meus serviços";
+							mes "para você porque,";
+							mes "você está carregando muita";
+							mes "coisa. Coloque seus itens extras no";
+							mes "armazém das Kafras e depois volte~";
+							close;
+						}
+						mes "[Removedora de Cartas]";
+						mes "Este item tem " + .@cardcount + " cartas nele.";
+						next;
+						if(select("Quero remover.:Deixa pra lá.") == 2) {
+							mes "[Removedora de Cartas]";
+							mes "Muito bem. Volte sempre que precisar de mim.";
+							close;
+						}
+						successremovecards .@part;
+						mes "[Removedora de Cartas]";
+						mes "O Processo foi um sucesso. Aqui estão suas cartas e seu item.";
+						close;
+					case 2:
+						mes "[Removedora de Cartas]";
+						mes "Muito bem. Volte quando precisar de mim.";
+						close;
+					}
+				}
+				break;
+			// Reparador de Itens
+			case 7:
+				.@loop_2 = 1;
+				while(.@loop_2)
+				{
+					.@b=1;
+					deletearray .@brokenid, getarraysize(.@brokenid);
+					while(1)
+					{
+						if( getbrokenid(.@b) == 0 )
+							break;
+						
+						.@brokennum[getarraysize(.@brokenid)] = .@b;
+						.@brokenid[getarraysize(.@brokenid)] = getbrokenid(.@b);
+						.@b++;
+					}
+					
+					if( !getarraysize(.@brokenid) )
+					{
+						mes "^FFA500[Atendente VIP]^000000";
+						mes "Vejo que você é cuidado-so com seus itens, você tem nenhum quebrado.";
+						next;
+						.@loop_2 = 0;
+						break;
+					}
+					
+					mes "^FFA500[Atendente VIP]^000000";
+					if( .@RepairCost )
+					{
+						mes "Para ^0000FFReparar um Equipamento^000000 é necessário ^FF0000" + .@RepairCost + " Zenys^000000.";
+						if( Zeny < .@RepairCost )
+						{
+							mes "^FF0000Você não possue " + .@Price + " Zenys.^000000";
+							next;
+							.@loop_2 = 0;
+							break;
+						}
+					}
+					
+					mes "Escolha o equipamento que deseja reparar.";
+					next;
+					set .@build_menu$, "";
+					for( .@i=0; .@i < getarraysize(.@brokenid); .@i++ )
+						set .@build_menu$, .@build_menu$ + "- " + getitemname(.@brokenid[.@i]) + ".:";
+						
+					.@choose = select(.@build_menu$+"^FF0000- Cancelar.^000000")-1;
+					
+					if( .@choose == getarraysize(.@brokenid) )
+						break;
+					
+					.@Price = .@RepairCost;
+					mes "^FFA500[Atendente VIP]^000000";
+					mes "Deseja reparar o ^0000FF" + getitemname(.@brokenid[.@choose]) + "^000000?";
+					next;
+					switch( select("- Sim, reparar.", "^FFA500- Não, escolher outro equipamento.", "^FF0000- Cancelar.^000000") )
+					{
+						case 1:
+							if( .@RepairCost )
+								Zeny -= .@RepairCost;
+								
+							specialeffect EF_REFINEOK;
+							repair .@brokennum[.@choose];
+							mes "^FF0000[Ferreiro]^000000";
+							mes "Muito bem, o seu ^0000FF" + getitemname(.@brokenid[.@choose]) + "^000000 foi reparado.";
+							close2;
+							cutin "", 255;
+							end;
+						case 2:
+							break;
+						case 3:
+							.@loop_2 = 0;
+							break;
+					}
+				}
+				break;
+			// Resetar Atributos
+			case 8:
+				mes "^FFA500[Atendente VIP]^000000";
+				if( .@ResetStatusCost )
+					mes "Para resetar seus atributos é necessário ^FF0000" + .@ResetStatusCost + " Zenys^000000.";
+					
+				if( .@ResetStatusBase )
+					mes "Você deve estar no ^FF0000Nível " + .@ResetStatusBase + " de Base^000000 para poder resetar seus atributos.";
+					
+				if( Zeny < .@ResetStatusCost )
+				{
+					mes "^FF0000Você não tem a quantidade de Zeny requerida para resetar seus atributos.^000000";
+					next;
+					break;
+				}
+
+				if( BaseLevel < .@ResetStatusBase )
+				{
+					mes "^FF0000Você não tem Nível de Base suficiente para resetar seus atributos.^000000";
+					next;
+					break;
+				}
+				
+				if( .@ResetStatusPoint && StatusPoint )
+				{
+					mes "^FF0000Você deve distribuir todos seus pontos de atributo para pode resetar.^000000";
+					next;
+					break;
+				}
+				
+				mes "Deseja ^0000FFResetar seus Atributos^000000?";
+				next;
+				if( select("- Sim, resetar atributos.", "^FF0000- Cancelar.^000000") == 2 )
+					break;
+				
+				if( .@ResetStatusCost )
+					Zeny -= .@ResetStatusCost;
+				
+				resetstatus;
+				mes "^FFA500[Atendente VIP]^000000";
+				mes "Muito bem, seus atributos foram resetados.";
+				close2;
+				cutin "", 255;
+				end;
+				
+			// Resetar Habilidades
+			case 9:
+				mes "^FFA500[Atendente VIP]^000000";
+				if( .@ResetSkillCost )
+					mes "Para resetar suas habilidades é necessário ^FF0000" + .@ResetSkillCost + " Zenys^000000.";
+					
+				if( .@ResetSkillJob )
+					mes "Você deve estar no ^FF0000Nível " + .@ResetSkillJob + " de Classe^000000 para poder resetar suas habilidades.";
+					
+				if( Zeny < .@ResetSkillCost )
+				{
+					mes "^FF0000Você não tem a quantidade de Zeny requerida para resetar suas habilidades.^000000";
+					next;
+					break;
+				}
+
+				if( JobLevel < .@ResetStatusJob )
+				{
+					mes "^FF0000Você não tem Nível de Classe suficiente para resetar suas habilidades.^000000";
+					next;
+					break;
+				}
+				
+				if( .@ResetSkillPoint && SkillPoint )
+				{
+					mes "^FF0000Você deve distribuir todos seus pontos de habilidade para pode resetar.^000000";
+					next;
+					break;
+				}
+				
+				mes "Deseja ^0000FFResetar suas Habilidades^000000?";
+				next;
+				if( select("- Sim, resetar habilidades.", "^FF0000- Cancelar.^000000") == 2 )
+					break;
+				
+				if( .@ResetSkillCost )
+					Zeny -= .@ResetSkillCost;
+				
+				resetskill;
+				mes "^FFA500[Atendente VIP]^000000";
+				mes "Muito bem, suas habilidades foram resetadas.";
+				close2;
+				cutin "", 255;
+				end;
+			// Salvar Ponto Atual
+			case 10:
+				if( .@SavePointCost )
+				{
+					mes "^FFA500[Atendente VIP]^000000";
+					mes "Para abrir o ^0000FFSalvar Ponto Atual^000000 é necessário ^FF0000" + .@SavePointCost + " Zenys^000000.";
+					if( Zeny < .@SavePointCost )
+					{
+						mes "^FF0000Você não tem o Zeny requirido.^000000";
+						next;
+						break;
+					}
+				}
+				mes "Deseja abrir o ^0000FFSalvar Ponto Atual^000000?";
+				next;
+				if( select("- Sim, Salvar Ponto Atual.", "^FF0000- Não, obrigado.^000000") == 2 )
+					break;
+				
+				if( .@SavePointCost )
+					Zeny -= .@SavePointCost;
+				
+				getmapxy .@m$, .@x, .@y, BL_PC;
+				savepoint .@m$, .@x, .@y;
+				mes "^FFA500[Atendente VIP]^000000";
+				mes "Muito bem, seu ^0000FFPonto Atual^000000 foi salvo com sucesso.";
+				close2;
+				cutin "", 255;
+				end;
+			// Encanatar Arma
+			case 11:
+				set .@npcencantador$,"^0000FF[Arma Encantada]^000000";
+
+				mes .@npcencantador$;
+				mes "Olá ^0000CD"+strcharinfo(0)+"^000000, bem vindo ao ^FF0000[Arma Encantada]^000000, eu posso Encantar a sua Arma com qualquer elemento por 5 minutos!";
+				next;
+				if(select("Sim.:Não.")==2){
+					mes .@npcencantador$;
+					mes "Volte quando precisar.";
+					close;
+				}
+				mes .@npcencantador$;
+				mes "Qual elemento você quer?";
+				next;
+				switch(select("^0000FFGeada^000000:^FF0000Chama^000000:^5C4033Terremoto^000000:^215E21Ventania^000000:^CFB53BSagrado^000000:^6B238EMaldito^000000:Sair.")){
+				case 1:
+					sc_start SC_WATERWEAPON,300000,5;			// 400000 = 1 Minuto: Encantar com Geada, Duração: 5 Minutos, Level 5
+					close;
+				case 2:
+					sc_start SC_FIREWEAPON,300000,5;			// 400000 = 1 Minuto: Encantar com Chama, Duração: 5 Minutos, Level 5
+					close;
+				case 3:
+					sc_start SC_EARTHWEAPON,300000,5;			// 400000 = 1 Minuto: Encantar com Terremoto, Duração: 5 Minutos, Level 5
+					close;
+				case 4:
+					sc_start SC_WINDWEAPON,300000,5;			// 400000 = 1 Minuto: Encantar com Ventania, Duração: 5 Minutos, Level 5
+					close;
+				case 5:
+					sc_start SC_ASPERSIO,300000,5;				// 400000 = 1 Minuto: Encantar com Sagrado, Duração: 5 Minutos, Level 5
+					close;
+				case 6:
+					sc_start SC_SHADOWWEAPON,300000,5;			// 400000 = 1 Minuto: Encantar com Maldito, Duração: 5 Minutos, Level 5
+					close;
+				case 7:
+					close;
+				}
+				break;
+
+			// Sala MVP
+			case 12:
+				mes "[ ^0065DFSala MVP^000000 ]";
+				mes "Qual a arena você";
+				mes "gostaria de entrar?";
+				next;
+				switch(select("Arena Alpha ["+getmapusers("pvp_n_1-2")+"]:Arena Beta ["+getmapusers("pvp_n_1-3")+"]:Arena Theta ["+getmapusers("pvp_n_1-4")+"]:Arena Epsilon ["+getmapusers("pvp_n_1-5")+"]")){
+				case 1:
+					mes "[ ^0065DFSala MVP^000000 ]";
+					mes "Certo agora informe o nível:";
+					switch(select("Nível 1 ["+getmapusers("pvp_n_1-2")+"]:Nível 2 ["+getmapusers("pvp_n_2-1")+"]:Nível 3 ["+getmapusers("pvp_n_3-2")+"]:Nível 4 ["+getmapusers("pvp_n_4-2")+"]:Nível 5 ["+getmapusers("pvp_n_5-2")+"]:Nível 6 ["+getmapusers("pvp_n_6-2")+"]:Nível 7 ["+getmapusers("pvp_n_7-2")+"]:Nível 8 ["+getmapusers("pvp_n_8-2")+"]")){
+					case 1:
+						warp "pvp_n_1-2",102,102;
+						end;
+					case 2:
+						warp "pvp_n_2-2",102,102;
+						end;
+					case 3:
+						warp "pvp_n_3-2",102,102;
+						end;
+					case 4:
+						warp "pvp_n_4-2",102,102;
+						end;
+					case 5:
+						warp "pvp_n_5-2",102,102;
+						end;
+					case 6:
+						warp "pvp_n_6-2",102,102;
+						end;
+					case 7:
+						warp "pvp_n_7-2",102,102;
+						end;
+					case 8:
+						warp "pvp_n_8-2",102,102;
+						end;
+					}
+				case 2:
+					mes "[ ^0065DFSala MVP^000000 ]";
+					mes "Certo agora informe o nível:";
+					switch(select("Nível 1 ["+getmapusers("pvp_n_1-3")+"]:Nível 2 ["+getmapusers("pvp_n_2-1")+"]:Nível 3 ["+getmapusers("pvp_n_3-3")+"]:Nível 4 ["+getmapusers("pvp_n_4-3")+"]:Nível 5 ["+getmapusers("pvp_n_5-3")+"]:Nível 6 ["+getmapusers("pvp_n_6-3")+"]:Nível 7 ["+getmapusers("pvp_n_7-3")+"]:Nível 8 ["+getmapusers("pvp_n_8-3")+"]")){
+					case 1:
+						warp "pvp_n_1-3",102,102;
+						end;
+					case 2:
+						warp "pvp_n_2-3",102,102;
+						end;
+					case 3:
+						warp "pvp_n_3-3",102,102;
+						end;
+					case 4:
+						warp "pvp_n_4-3",102,102;
+						end;
+					case 5:
+						warp "pvp_n_5-3",102,102;
+						end;
+					case 6:
+						warp "pvp_n_6-3",102,102;
+						end;
+					case 7:
+						warp "pvp_n_7-3",102,102;
+						end;
+					case 8:
+						warp "pvp_n_8-3",102,102;
+						end;
+					}
+				case 3:
+					mes "[ ^0065DFSala MVP^000000 ]";
+					mes "Certo agora informe o nível:";
+					switch(select("Nível 1 ["+getmapusers("pvp_n_1-4")+"]:Nível 2 ["+getmapusers("pvp_n_2-1")+"]:Nível 3 ["+getmapusers("pvp_n_3-4")+"]:Nível 4 ["+getmapusers("pvp_n_4-4")+"]:Nível 5 ["+getmapusers("pvp_n_5-4")+"]:Nível 6 ["+getmapusers("pvp_n_6-4")+"]:Nível 7 ["+getmapusers("pvp_n_7-4")+"]:Nível 8 ["+getmapusers("pvp_n_8-4")+"]")){
+					case 1:
+						warp "pvp_n_1-4",102,102;
+						end;
+					case 2:
+						warp "pvp_n_2-4",102,102;
+						end;
+					case 3:
+						warp "pvp_n_3-4",102,102;
+						end;
+					case 4:
+						warp "pvp_n_4-4",102,102;
+						end;
+					case 5:
+						warp "pvp_n_5-4",102,102;
+						end;
+					case 6:
+						warp "pvp_n_6-4",102,102;
+						end;
+					case 7:
+						warp "pvp_n_7-4",102,102;
+						end;
+					case 8:
+						warp "pvp_n_8-4",102,102;
+						end;
+					}
+				case 4:
+					mes "[ ^0065DFSala MVP^000000 ]";
+					mes "Certo agora informe o nível:";
+					switch(select("Nível 1 ["+getmapusers("pvp_n_1-5")+"]:Nível 2 ["+getmapusers("pvp_n_2-1")+"]:Nível 3 ["+getmapusers("pvp_n_3-5")+"]:Nível 4 ["+getmapusers("pvp_n_4-5")+"]:Nível 5 ["+getmapusers("pvp_n_5-5")+"]:Nível 6 ["+getmapusers("pvp_n_6-5")+"]:Nível 7 ["+getmapusers("pvp_n_7-5")+"]:Nível 8 ["+getmapusers("pvp_n_8-5")+"]")){
+					case 1:
+						warp "pvp_n_1-5",102,102;
+						end;
+					case 2:
+						warp "pvp_n_2-5",102,102;
+						end;
+					case 3:
+						warp "pvp_n_3-5",102,102;
+						end;
+					case 4:
+						warp "pvp_n_4-5",102,102;
+						end;
+					case 5:
+						warp "pvp_n_5-5",102,102;
+						end;
+					case 6:
+						warp "pvp_n_6-5",102,102;
+						end;
+					case 7:
+						warp "pvp_n_7-5",102,102;
+						end;
+					case 8:
+						warp "pvp_n_8-5",102,102;
+						end;
+					}
+				}
+				break;
+
+			case 13:
+				//> Início das Configurações
+				// Observações: As cores das mensagens podem ser aleradas nas linhas:
+				//
+				// "DelayAnnounce("Mensagem","Torpedo","0xFFFF00");"
+				//
+				// Onde "0xFFFF00" será a cor delimitada.
+
+				// Opções de menu, coloque 1 para habilitar menus de 'torpedo(normal), compra, venda, troca.
+				set .Opt,1;
+
+				// Palavras bloqueadas.
+				setarray .palavras$[1],"cú","buceta","caralho","pinto"; //Coloque aqui as palavras bloqueadas, cada uma dentro das aspas.
+
+				// Configuração do Tempo de Delay. (Padrão: 10 minutos)
+				set .DelayAnn,5;
+
+				// Configuração Zenys (Padrão: 200.000z)
+				set .Zeny,50000;
+
+				// Nível de BASE mínimo para uso do NPC. (Padrão: 40)
+				set .LevelUser,10;
+
+				//> Início do Script
+				function DelayAnnounce;
+				if(!DelayAnnounce("DelayGet",getcharid(3),.DelayAnn))
+				{
+					mes "[Anunciador]";
+					mes "Desculpe, mas você deve esperar ^FF0000"+.DelayAnn+"^000000 minuto(s) para poder enviar outro torpedo.";
+					close;
+				}
+
+				mes "[Anunciador]";
+				mes "Olá "+strcharinfo(0)+", deseja enviar uma mensagem?";
+				mes "Total enviados: ^0000FF"+#envio+"^000000";
+				if (.DelayAnn > 0) {
+					mes "Delay: ^0000FF"+.DelayAnn+" minutos.^000000";
+				}
+				if (.Zeny > 0) {
+					mes "Valor: ^0000FF"+.Zeny+"z^000000";
+				}
+				if(select("Sim:Não") == 2) close;
+				if(.Opt == 1) {
+					switch(select("Torpedo","Venda","Compra","Troca")) {
+					case 1:
+						DelayAnnounce("Mensagem","Torpedo","0xFFFF00");
+					case 2:
+						DelayAnnounce("Mensagem","vender","0x00BFFF");
+					case 3:
+						DelayAnnounce("Mensagem","comprar","0x00CD00");
+					case 4:
+						DelayAnnounce("Mensagem","trocar","0xFF0000");
+					}
+				} else { 
+					DelayAnnounce("Mensagem","Torpedo","0xFFFF00");
+				}
+
+				function	DelayAnnounce	{
+				
+					if( GetArg(0) == "DelaySet" )
+					{
+						setd "$anndelay_"+GetArg(1),gettime(4)*24*60 + gettime(6)*60 + gettime(2);
+						return 0;
+					}
+
+					else
+
+					if( GetArg(0) == "DelayGet" )
+					{
+						set .@check, gettime(4)*24*60 + gettime(6)*60 + gettime(2) - getd("$anndelay_"+GetArg(1));
+						return !(.@check >= 0 && .@check < GetArg(2) );
+					}
+
+					if( GetArg(0) == "Mensagem" )
+					{
+					next;
+					Restart:
+					mes "[Anunciador]";
+					mes "Muito bem, digite a sua mensagem:";
+					mes " ";
+					mes "Digite 'fechar' para sair.";
+					input @msg$;
+					if(@msg$ == "fechar") { close; }
+					next;
+
+					if(Zeny < .Zeny)
+					{
+						mes "[Anunciador]";
+						mes "Me desculpe mas você não tem";
+						mes "zenys suficientes para usar";
+						mes "o serviço de torpedos.";
+						next;
+						mes "[Anunciador]";
+						mes "Você irá precisar de ^FF0000"+.Zeny+"z^000000.";
+						close;
+					}
+
+					if(BaseLevel < .LevelUser)
+					{
+						mes "[Anunciador]";
+						mes "Me desculpe mais por";
+						mes "questões de segurança,";
+						mes "você precisa ter o level";
+						mes "maior que ^FF0000"+.LevelUser+"^000000.";
+						close;
+					}
+
+					for(set .@i,1; .@i < getarraysize(.palavras$); set .@i,.@i+1)
+					{
+						if(compare(@msg$,.palavras$[.@i]))
+						{
+							mes "[Anunciador]";
+							mes "Desculpe, mais não é permitido palavrões no anuncio.";
+							close;
+						}
+					}
+					mes "[Anunciador]";
+					mes "Você digitou:";
+					mes "'^FF0000"+@msg$+"^000000'";
+					if(select("Correto!","Não, está errado...") == 2) { close2;	goto Restart; }
+					if(getarg(1) != "Torpedo") { announce "["+strcharInfo(0)+"] quer "+getarg(1)+": "+@msg$+".",bc_all,getarg(2); } else { announce "["+strcharInfo(0)+"](Torpedo) disse: "+@msg$+".",bc_all,getarg(2); }
+					; }
+					DelayAnnounce("DelaySet",getcharid(3));
+					if (.Zeny > 0) { set Zeny,Zeny-.Zeny; }
+					set #envio,#envio+1;
+					close;
+				}
+				break;
+
+			default:
+				.@loop_1 = 0;
+				break;
+		}
+	}
+	
+	if( .@cutin$ != "" )
+		cutin .@cutin$, 2;
+
+	mes "^FFA500[Atendente VIP]^000000";
+	mes "A Corporação Kafra estará com você aonde quer você vá!";
+	close2;
+	cutin "", 255;
+	end;
+}
+
+// Protectors
+function	script	Protector	{
+	switch(select(""+((getarg(0)=="")?"":"Mudar de Arena")+":Curar:Sair da Sala")) {
+	case 1:
+		mes "[Protetor]";
+		mes "Certo agora informe o nível:";
+		next;
+		switch(select("Arena Alpha ["+getmapusers("pvp_n_1-2")+"]:Arena Beta ["+getmapusers("pvp_n_1-3")+"]:Arena Theta ["+getmapusers("pvp_n_1-4")+"]:Arena Epsilon ["+getmapusers("pvp_n_1-5")+"]")){
+		case 1:
+			mes "[Protetor]";
+			mes "Certo agora informe o nível:";
+			switch(select("Nível 1 ["+getmapusers("pvp_n_1-2")+"]:Nível 2 ["+getmapusers("pvp_n_2-1")+"]:Nível 3 ["+getmapusers("pvp_n_3-2")+"]:Nível 4 ["+getmapusers("pvp_n_4-2")+"]:Nível 5 ["+getmapusers("pvp_n_5-2")+"]:Nível 6 ["+getmapusers("pvp_n_6-2")+"]:Nível 7 ["+getmapusers("pvp_n_7-2")+"]:Nível 8 ["+getmapusers("pvp_n_8-2")+"]")){
+			case 1:
+				warp "pvp_n_1-2",102,102;
+				end;
+			case 2:
+				warp "pvp_n_2-2",102,102;
+				end;
+			case 3:
+				warp "pvp_n_3-2",102,102;
+				end;
+			case 4:
+				warp "pvp_n_4-2",102,102;
+				end;
+			case 5:
+				warp "pvp_n_5-2",102,102;
+				end;
+			case 6:
+				warp "pvp_n_6-2",102,102;
+				end;
+			case 7:
+				warp "pvp_n_7-2",102,102;
+				end;
+			case 8:
+				warp "pvp_n_8-2",102,102;
+				end;
+			}
+		case 2:
+			mes "[Protetor]";
+			mes "Certo agora informe o nível:";
+			switch(select("Nível 1 ["+getmapusers("pvp_n_1-3")+"]:Nível 2 ["+getmapusers("pvp_n_2-1")+"]:Nível 3 ["+getmapusers("pvp_n_3-3")+"]:Nível 4 ["+getmapusers("pvp_n_4-3")+"]:Nível 5 ["+getmapusers("pvp_n_5-3")+"]:Nível 6 ["+getmapusers("pvp_n_6-3")+"]:Nível 7 ["+getmapusers("pvp_n_7-3")+"]:Nível 8 ["+getmapusers("pvp_n_8-3")+"]")){
+			case 1:
+				warp "pvp_n_1-3",102,102;
+				end;
+			case 2:
+				warp "pvp_n_2-3",102,102;
+				end;
+			case 3:
+				warp "pvp_n_3-3",102,102;
+				end;
+			case 4:
+				warp "pvp_n_4-3",102,102;
+				end;
+			case 5:
+				warp "pvp_n_5-3",102,102;
+				end;
+			case 6:
+				warp "pvp_n_6-3",102,102;
+				end;
+			case 7:
+				warp "pvp_n_7-3",102,102;
+				end;
+			case 8:
+				warp "pvp_n_8-3",102,102;
+				end;
+			}
+		case 3:
+			mes "[Protetor]";
+			mes "Certo agora informe o nível:";
+			switch(select("Nível 1 ["+getmapusers("pvp_n_1-4")+"]:Nível 2 ["+getmapusers("pvp_n_2-1")+"]:Nível 3 ["+getmapusers("pvp_n_3-4")+"]:Nível 4 ["+getmapusers("pvp_n_4-4")+"]:Nível 5 ["+getmapusers("pvp_n_5-4")+"]:Nível 6 ["+getmapusers("pvp_n_6-4")+"]:Nível 7 ["+getmapusers("pvp_n_7-4")+"]:Nível 8 ["+getmapusers("pvp_n_8-4")+"]")){
+			case 1:
+				warp "pvp_n_1-4",102,102;
+				end;
+			case 2:
+				warp "pvp_n_2-4",102,102;
+				end;
+			case 3:
+				warp "pvp_n_3-4",102,102;
+				end;
+			case 4:
+				warp "pvp_n_4-4",102,102;
+				end;
+			case 5:
+				warp "pvp_n_5-4",102,102;
+				end;
+			case 6:
+				warp "pvp_n_6-4",102,102;
+				end;
+			case 7:
+				warp "pvp_n_7-4",102,102;
+				end;
+			case 8:
+				warp "pvp_n_8-4",102,102;
+				end;
+			}
+		case 4:
+			mes "[Protetor]";
+			mes "Certo agora informe o nível:";
+			switch(select("Nível 1 ["+getmapusers("pvp_n_1-5")+"]:Nível 2 ["+getmapusers("pvp_n_2-1")+"]:Nível 3 ["+getmapusers("pvp_n_3-5")+"]:Nível 4 ["+getmapusers("pvp_n_4-5")+"]:Nível 5 ["+getmapusers("pvp_n_5-5")+"]:Nível 6 ["+getmapusers("pvp_n_6-5")+"]:Nível 7 ["+getmapusers("pvp_n_7-5")+"]:Nível 8 ["+getmapusers("pvp_n_8-5")+"]")){
+			case 1:
+				warp "pvp_n_1-5",102,102;
+				end;
+			case 2:
+				warp "pvp_n_2-5",102,102;
+				end;
+			case 3:
+				warp "pvp_n_3-5",102,102;
+				end;
+			case 4:
+				warp "pvp_n_4-5",102,102;
+				end;
+			case 5:
+				warp "pvp_n_5-5",102,102;
+				end;
+			case 6:
+				warp "pvp_n_6-5",102,102;
+				end;
+			case 7:
+				warp "pvp_n_7-5",102,102;
+				end;
+			case 8:
+				warp "pvp_n_8-5",102,102;
+				end;
+			}
+		}
+	case 2:
+		specialeffect2 EF_HEAL2;
+		percentheal 100,100;
+		end;
+	case 3:
+		warp "prontera",156,179;
+		end;
+	}
+}
+
+pvp_n_1-2,100,100,4	script	Protetor#01	727,{ callfunc "Protector","pvp_n_2-2"; }
+pvp_n_2-2,100,100,4	script	Protetor#02	727,{ callfunc "Protector","pvp_n_3-2"; }
+pvp_n_3-2,100,100,4	script	Protetor#03	727,{ callfunc "Protector","pvp_n_4-2"; }
+pvp_n_4-2,100,100,4	script	Protetor#04	727,{ callfunc "Protector","pvp_n_5-2"; }
+pvp_n_5-2,100,100,4	script	Protetor#05	727,{ callfunc "Protector","pvp_n_6-2"; }
+pvp_n_6-2,100,100,4	script	Protetor#06	727,{ callfunc "Protector","pvp_n_7-2"; }
+pvp_n_7-2,100,100,4	script	Protetor#07	727,{ callfunc "Protector","pvp_n_8-2"; }
+pvp_n_8-2,100,100,4	script	Protetor#08	727,{ callfunc "Protector",""; }
+pvp_n_1-3,100,100,4	script	Protetor#09	727,{ callfunc "Protector","pvp_n_2-3"; }
+pvp_n_2-3,100,100,4	script	Protetor#10	727,{ callfunc "Protector","pvp_n_3-3"; }
+pvp_n_3-3,100,100,4	script	Protetor#11	727,{ callfunc "Protector","pvp_n_4-3"; }
+pvp_n_4-3,100,100,4	script	Protetor#12	727,{ callfunc "Protector","pvp_n_5-3"; }
+pvp_n_5-3,100,100,4	script	Protetor#13	727,{ callfunc "Protector","pvp_n_6-3"; }
+pvp_n_6-3,100,100,4	script	Protetor#14	727,{ callfunc "Protector","pvp_n_7-3"; }
+pvp_n_7-3,100,100,4	script	Protetor#15	727,{ callfunc "Protector","pvp_n_8-3"; }
+pvp_n_8-3,100,100,4	script	Protetor#16	727,{ callfunc "Protector",""; }
+pvp_n_1-4,100,100,4	script	Protetor#17	727,{ callfunc "Protector","pvp_n_2-4"; }
+pvp_n_2-4,100,100,4	script	Protetor#18	727,{ callfunc "Protector","pvp_n_3-4"; }
+pvp_n_3-4,100,100,4	script	Protetor#19	727,{ callfunc "Protector","pvp_n_4-4"; }
+pvp_n_4-4,100,100,4	script	Protetor#20	727,{ callfunc "Protector","pvp_n_5-4"; }
+pvp_n_5-4,100,100,4	script	Protetor#21	727,{ callfunc "Protector","pvp_n_6-4"; }
+pvp_n_6-4,100,100,4	script	Protetor#22	727,{ callfunc "Protector","pvp_n_7-4"; }
+pvp_n_7-4,100,100,4	script	Protetor#23	727,{ callfunc "Protector","pvp_n_8-4"; }
+pvp_n_8-4,100,100,4	script	Protetor#24	727,{ callfunc "Protector",""; }
+pvp_n_1-5,100,100,4	script	Protetor#25	727,{ callfunc "Protector","pvp_n_2-5"; }
+pvp_n_2-5,100,100,4	script	Protetor#26	727,{ callfunc "Protector","pvp_n_3-5"; }
+pvp_n_3-5,100,100,4	script	Protetor#27	727,{ callfunc "Protector","pvp_n_4-5"; }
+pvp_n_4-5,100,100,4	script	Protetor#28	727,{ callfunc "Protector","pvp_n_5-5"; }
+pvp_n_5-5,100,100,4	script	Protetor#29	727,{ callfunc "Protector","pvp_n_6-5"; }
+pvp_n_6-5,100,100,4	script	Protetor#30	727,{ callfunc "Protector","pvp_n_7-5"; }
+pvp_n_7-5,100,100,4	script	Protetor#31	727,{ callfunc "Protector","pvp_n_8-5"; }
+pvp_n_8-5,100,100,4	script	Protetor#32	727,{ callfunc "Protector",""; }
+
+// Alpha
+pvp_n_1-2,0,0	monster	Eddga	 1115,3,60000,66000
+pvp_n_1-2,0,0	monster	Abelha-Rainha	1059,1,60000,66000
+pvp_n_2-2,0,0	monster	Abelha-Rainha	1059,3,60000,66000
+pvp_n_2-2,0,0	monster	Flor do Luar	1150,1,60000,66000
+pvp_n_3-2,0,0	monster	Abelha-Rainha	1059,1,60000,66000
+pvp_n_3-2,0,0	monster	Flor do Luar	1150,2,60000,66000
+pvp_n_3-2,0,0	monster	Maya	1147,1,60000,66000
+pvp_n_4-2,0,0	monster	Eddga	1115,1,60000,66000
+pvp_n_4-2,0,0	monster	Abelha-Rainha	1059,1,60000,66000
+pvp_n_4-2,0,0	monster	Flor do Luar	1150,1,60000,66000
+pvp_n_4-2,0,0	monster	Maya	1147,1,60000,66000
+pvp_n_5-2,0,0	monster	Eddga	1115,1,60000,66000
+pvp_n_5-2,0,0	monster	Abelha-Rainha	1059,2,60000,66000
+pvp_n_5-2,0,0	monster	Flor do Luar	1150,1,60000,66000
+pvp_n_5-2,0,0	monster	Maya	1147,2,60000,66000
+pvp_n_6-2,0,0	monster	Eddga	1115,2,60000,66000
+pvp_n_6-2,0,0	monster	Abelha-Rainha	1059,3,60000,66000
+pvp_n_6-2,0,0	monster	Flor do Luar	1150,1,60000,66000
+pvp_n_6-2,0,0	monster	Maya	1147,2,60000,66000
+pvp_n_7-2,0,0	monster	Eddga	1115,3,60000,66000
+pvp_n_7-2,0,0	monster	Abelha-Rainha	1059,3,60000,66000
+pvp_n_7-2,0,0	monster	Flor do Luar	1150,2,60000,66000
+pvp_n_7-2,0,0	monster	Maya	1147,2,60000,66000
+pvp_n_8-2,0,0	monster	Eddga	1115,3,60000,66000
+pvp_n_8-2,0,0	monster	Abelha-Rainha	1059,3,60000,66000
+pvp_n_8-2,0,0	monster	Flor do Luar	1150,3,60000,66000
+pvp_n_8-2,0,0	monster	Maya	1147,3,60000,66000
+
+// Beta
+pvp_n_1-3,0,0	monster	Freeoni	1159,3,60000,66000
+pvp_n_1-3,0,0	monster	General Tartaruga	1312,1,60000,66000
+pvp_n_2-3,0,0	monster	Freeoni	1159,2,60000,66000
+pvp_n_2-3,0,0	monster	General Tartaruga	1312,1,60000,66000
+pvp_n_2-3,0,0	monster	Orc Herói	1087,1,60000,66000
+pvp_n_3-3,0,0	monster	Freeoni	1159,1,60000,66000
+pvp_n_3-3,0,0	monster	General Tartaruga	1312,1,60000,66000
+pvp_n_3-3,0,0	monster	Orc Herói	1087,1,60000,66000
+pvp_n_3-3,0,0	monster	Senhor dos Orcs	1190,1,60000,66000
+pvp_n_4-3,0,0	monster	Freeoni	1159,2,60000,66000
+pvp_n_4-3,0,0	monster	General Tartaruga	1312,1,60000,66000
+pvp_n_4-3,0,0	monster	Orc Herói	1087,1,60000,66000
+pvp_n_4-3,0,0	monster	Senhor dos Orcs	1190,1,60000,66000
+pvp_n_5-3,0,0	monster	Freeoni	1159,1,60000,66000
+pvp_n_5-3,0,0	monster	General Tartaruga	1312,2,60000,66000
+pvp_n_5-3,0,0	monster	Orc Herói	1087,2,60000,66000
+pvp_n_5-3,0,0	monster	Senhor dos Orcs	1190,1,60000,66000
+pvp_n_6-3,0,0	monster	Freeoni	1159,2,60000,66000
+pvp_n_6-3,0,0	monster	General Tartaruga	1312,1,60000,66000
+pvp_n_6-3,0,0	monster	Orc Herói	1087,2,60000,66000
+pvp_n_6-3,0,0	monster	Senhor dos Orcs	1190,2,60000,66000
+pvp_n_7-3,0,0	monster	Freeoni	1159,3,60000,66000
+pvp_n_7-3,0,0	monster	General Tartaruga	1312,1,60000,66000
+pvp_n_7-3,0,0	monster	Orc Herói	1087,2,60000,66000
+pvp_n_7-3,0,0	monster	Senhor dos Orcs	1190,3,60000,66000
+pvp_n_8-3,0,0	monster	Freeoni	1159,3,60000,66000
+pvp_n_8-3,0,0	monster	General Tartaruga	1312,3,60000,66000
+pvp_n_8-3,0,0	monster	Orc Herói	1087,3,60000,66000
+pvp_n_8-3,0,0	monster	Senhor dos Orcs	1190,3,60000,66000
+
+// Theta
+pvp_n_1-4,0,0	monster	Drake	1112,3,60000,66000
+pvp_n_1-4,0,0	monster	Osíris	1038,1,60000,66000
+pvp_n_2-4,0,0	monster	Drake	1112,2,60000,66000
+pvp_n_2-4,0,0	monster	Osíris	1038,1,60000,66000
+pvp_n_2-4,0,0	monster	Doppelganger	1046,1,60000,66000
+pvp_n_2-4,0,0	monster	Kiel	1733,2,60000,66000
+pvp_n_3-4,0,0	monster	Drake	1112,1,60000,66000
+pvp_n_3-4,0,0	monster	Osíris	1038,1,60000,66000
+pvp_n_3-4,0,0	monster	Doppelganger	1046,1,60000,66000
+pvp_n_3-4,0,0	monster	Senhor dos Mortos	1373,1,60000,66000
+pvp_n_3-4,0,0	monster	Kiel	1733,3,60000,66000
+pvp_n_4-4,0,0	monster	Drake	1112,2,60000,66000
+pvp_n_4-4,0,0	monster	Osíris	1038,1,60000,66000
+pvp_n_4-4,0,0	monster	Doppelganger	1046,2,60000,66000
+pvp_n_4-4,0,0	monster	Senhor dos Mortos	1373,1,60000,66000
+pvp_n_4-4,0,0	monster	Kiel	1733,4,60000,66000
+pvp_n_5-4,0,0	monster	Drake	1112,3,60000,66000
+pvp_n_5-4,0,0	monster	Osíris	1038,2,60000,66000
+pvp_n_5-4,0,0	monster	Doppelganger	1046,2,60000,66000
+pvp_n_5-4,0,0	monster	Senhor dos Mortos	1373,1,60000,66000
+pvp_n_6-4,0,0	monster	Drake	1112,3,60000,66000
+pvp_n_6-4,0,0	monster	Osíris	1038,2,60000,66000
+pvp_n_6-4,0,0	monster	Doppelganger	1046,2,60000,66000
+pvp_n_6-4,0,0	monster	Senhor dos Mortos	1373,2,60000,66000
+pvp_n_7-4,0,0	monster	Drake	1112,3,60000,66000
+pvp_n_7-4,0,0	monster	Osíris	1038,2,60000,66000
+pvp_n_7-4,0,0	monster	Doppelganger	1046,3,60000,66000
+pvp_n_7-4,0,0	monster	Senhor dos Mortos	1373,2,60000,66000
+pvp_n_8-4,0,0	monster	Drake	1112,3,60000,66000
+pvp_n_8-4,0,0	monster	Osíris	1038,3,60000,66000
+pvp_n_8-4,0,0	monster	Doppelganger	1046,3,60000,66000
+pvp_n_8-4,0,0	monster	Senhor dos Mortos	1373,3,60000,66000
+
+// Epsilon
+pvp_n_1-5,0,0	monster	Samurai Encarnado	1492,3,60000,66000
+pvp_n_1-5,0,0	monster	Faraó	1157,1,60000,66000
+pvp_n_2-5,0,0	monster	Samurai Encarnado	1492,2,60000,66000
+pvp_n_2-5,0,0	monster	Faraó	1157,1,60000,66000
+pvp_n_2-5,0,0	monster	Senhor das Trevas	1272,1,60000,66000
+pvp_n_3-5,0,0	monster	Samurai Encarnado	1492,1,60000,66000
+pvp_n_3-5,0,0	monster	Faraó	1157,1,60000,66000
+pvp_n_3-5,0,0	monster	Senhor das Trevas	1272,1,60000,66000
+pvp_n_3-5,0,0	monster	Bafomé	1039,1,60000,66000
+pvp_n_4-5,0,0	monster	Samurai Encarnado	1492,3,60000,66000
+pvp_n_4-5,0,0	monster	Faraó	1157,1,60000,66000
+pvp_n_4-5,0,0	monster	Senhor das Trevas	1272,1,60000,66000
+pvp_n_4-5,0,0	monster	Bafomé	1039,1,60000,66000
+pvp_n_5-5,0,0	monster	Samurai Encarnado	1492,2,60000,66000
+pvp_n_5-5,0,0	monster	Faraó	1157,2,60000,66000
+pvp_n_5-5,0,0	monster	Senhor das Trevas	1272,2,60000,66000
+pvp_n_5-5,0,0	monster	Bafomé	1039,1,60000,66000
+pvp_n_6-5,0,0	monster	Samurai Encarnado	1492,2,60000,66000
+pvp_n_6-5,0,0	monster	Faraó	1157,2,60000,66000
+pvp_n_6-5,0,0	monster	Senhor das Trevas	1272,2,60000,66000
+pvp_n_6-5,0,0	monster	Bafomé	1039,1,60000,66000
+pvp_n_7-5,0,0	monster	Samurai Encarnado	1492,2,60000,66000
+pvp_n_7-5,0,0	monster	Faraó	1157,2,60000,66000
+pvp_n_7-5,0,0	monster	Senhor das Trevas	1272,2,60000,66000
+pvp_n_7-5,0,0	monster	Bafomé	1039,2,60000,66000
+pvp_n_8-5,0,0	monster	Samurai Encarnado	1492,3,60000,66000
+pvp_n_8-5,0,0	monster	Faraó	1157,2,60000,66000
+pvp_n_8-5,0,0	monster	Senhor das Trevas	1272,2,60000,66000
+pvp_n_8-5,0,0	monster	Bafomé	1039,2,60000,66000
+
+// Warps
+pvp_n_1-4,147,129,0	warp	mvp1	1,1,pvp_n_1-4,143,160
+pvp_n_1-4,143,156,0	warp	mvp2	1,1,pvp_n_1-4,147,125
+pvp_n_1-4,107,162,0	warp	mvp3	1,1,pvp_n_1-4,136,168
+pvp_n_1-4,132,168,0	warp	mvp4	1,1,pvp_n_1-4,104,162
+pvp_n_1-4,147,114,0	warp	mvp5	1,1,pvp_n_1-4,145,85
+pvp_n_1-4,145,89,0	warp	mvp6	1,1,pvp_n_1-4,147,120
+pvp_n_1-4,107,88,0	warp	mvp7	1,1,pvp_n_1-4,136,82
+pvp_n_1-4,132,82,0	warp	mvp8	1,1,pvp_n_1-4,104,88
+pvp_n_1-4,55,129,0	warp	mvp9	1,1,pvp_n_1-4,57,160
+pvp_n_1-4,57,156,0	warp	mvp10	1,1,pvp_n_1-4,58,125
+pvp_n_1-4,55,114,0	warp	mvp11	1,1,pvp_n_1-4,58,85
+pvp_n_1-4,58,89,0	warp	mvp12	1,1,pvp_n_1-4,55,118
+pvp_n_1-4,92,88,0	warp	mvp13	1,1,pvp_n_1-4,64,78
+pvp_n_1-4,67,78,0	warp	mvp14	1,1,pvp_n_1-4,95,88
+pvp_n_1-4,92,161,0	warp	mvp15	1,1,pvp_n_1-4,63,168
+pvp_n_1-4,67,168,0	warp	mvp16	1,1,pvp_n_1-4,95,161
+
+pvp_n_2-4,147,129,0	warp	mvp17	1,1,pvp_n_2-4,143,160
+pvp_n_2-4,143,156,0	warp	mvp18	1,1,pvp_n_2-4,147,125
+pvp_n_2-4,107,162,0	warp	mvp19	1,1,pvp_n_2-4,136,168
+pvp_n_2-4,132,168,0	warp	mvp20	1,1,pvp_n_2-4,104,162
+pvp_n_2-4,147,114,0	warp	mvp21	1,1,pvp_n_2-4,145,85
+pvp_n_2-4,145,89,0	warp	mvp22	1,1,pvp_n_2-4,147,120
+pvp_n_2-4,107,88,0	warp	mvp23	1,1,pvp_n_2-4,136,82
+pvp_n_2-4,132,82,0	warp	mvp24	1,1,pvp_n_2-4,104,88
+pvp_n_2-4,55,129,0	warp	mvp25	1,1,pvp_n_2-4,57,160
+pvp_n_2-4,57,156,0	warp	mvp26	1,1,pvp_n_2-4,58,125
+pvp_n_2-4,55,114,0	warp	mvp27	1,1,pvp_n_2-4,58,85
+pvp_n_2-4,58,89,0	warp	mvp28	1,1,pvp_n_2-4,55,118
+pvp_n_2-4,92,88,0	warp	mvp29	1,1,pvp_n_2-4,64,78
+pvp_n_2-4,67,78,0	warp	mvp30	1,1,pvp_n_2-4,95,88
+pvp_n_2-4,92,161,0	warp	mvp31	1,1,pvp_n_2-4,63,168
+pvp_n_2-4,67,168,0	warp	mvp32	1,1,pvp_n_2-4,95,161
+
+pvp_n_3-4,147,129,0	warp	mvp33	1,1,pvp_n_3-4,143,160
+pvp_n_3-4,143,156,0	warp	mvp34	1,1,pvp_n_3-4,147,125
+pvp_n_3-4,107,162,0	warp	mvp35	1,1,pvp_n_3-4,136,168
+pvp_n_3-4,132,168,0	warp	mvp36	1,1,pvp_n_3-4,104,162
+pvp_n_3-4,147,114,0	warp	mvp37	1,1,pvp_n_3-4,145,85
+pvp_n_3-4,145,89,0	warp	mvp38	1,1,pvp_n_3-4,147,120
+pvp_n_3-4,107,88,0	warp	mvp39	1,1,pvp_n_3-4,136,82
+pvp_n_3-4,132,82,0	warp	mvp40	1,1,pvp_n_3-4,104,88
+pvp_n_3-4,55,129,0	warp	mvp41	1,1,pvp_n_3-4,57,160
+pvp_n_3-4,57,156,0	warp	mvp42	1,1,pvp_n_3-4,58,125
+pvp_n_3-4,55,114,0	warp	mvp43	1,1,pvp_n_3-4,58,85
+pvp_n_3-4,58,89,0	warp	mvp44	1,1,pvp_n_3-4,55,118
+pvp_n_3-4,92,88,0	warp	mvp45	1,1,pvp_n_3-4,64,78
+pvp_n_3-4,67,78,0	warp	mvp46	1,1,pvp_n_3-4,95,88
+pvp_n_3-4,92,161,0	warp	mvp47	1,1,pvp_n_3-4,63,168
+pvp_n_3-4,67,168,0	warp	mvp48	1,1,pvp_n_3-4,95,161
+
+pvp_n_4-4,147,129,0	warp	mvp49	1,1,pvp_n_4-4,143,160
+pvp_n_4-4,143,156,0	warp	mvp50	1,1,pvp_n_4-4,147,125
+pvp_n_4-4,107,162,0	warp	mvp51	1,1,pvp_n_4-4,136,168
+pvp_n_4-4,132,168,0	warp	mvp52	1,1,pvp_n_4-4,104,162
+pvp_n_4-4,147,114,0	warp	mvp53	1,1,pvp_n_4-4,145,85
+pvp_n_4-4,145,89,0	warp	mvp54	1,1,pvp_n_4-4,147,120
+pvp_n_4-4,107,88,0	warp	mvp55	1,1,pvp_n_4-4,136,82
+pvp_n_4-4,132,82,0	warp	mvp56	1,1,pvp_n_4-4,104,88
+pvp_n_4-4,55,129,0	warp	mvp57	1,1,pvp_n_4-4,57,160
+pvp_n_4-4,57,156,0	warp	mvp58	1,1,pvp_n_4-4,58,125
+pvp_n_4-4,55,114,0	warp	mvp59	1,1,pvp_n_4-4,58,85
+pvp_n_4-4,58,89,0	warp	mvp60	1,1,pvp_n_4-4,55,118
+pvp_n_4-4,92,88,0	warp	mvp61	1,1,pvp_n_4-4,64,78
+pvp_n_4-4,67,78,0	warp	mvp62	1,1,pvp_n_4-4,95,88
+pvp_n_4-4,92,161,0	warp	mvp63	1,1,pvp_n_4-4,63,168
+pvp_n_4-4,67,168,0	warp	mvp64	1,1,pvp_n_4-4,95,161
+
+pvp_n_5-4,147,129,0	warp	mvp65	1,1,pvp_n_5-4,143,160
+pvp_n_5-4,143,156,0	warp	mvp66	1,1,pvp_n_5-4,147,125
+pvp_n_5-4,107,162,0	warp	mvp67	1,1,pvp_n_5-4,136,168
+pvp_n_5-4,132,168,0	warp	mvp68	1,1,pvp_n_5-4,104,162
+pvp_n_5-4,147,114,0	warp	mvp69	1,1,pvp_n_5-4,145,85
+pvp_n_5-4,145,89,0	warp	mvp70	1,1,pvp_n_5-4,147,120
+pvp_n_5-4,107,88,0	warp	mvp71	1,1,pvp_n_5-4,136,82
+pvp_n_5-4,132,82,0	warp	mvp72	1,1,pvp_n_5-4,104,88
+pvp_n_5-4,55,129,0	warp	mvp73	1,1,pvp_n_5-4,57,160
+pvp_n_5-4,57,156,0	warp	mvp74	1,1,pvp_n_5-4,58,125
+pvp_n_5-4,55,114,0	warp	mvp75	1,1,pvp_n_5-4,58,85
+pvp_n_5-4,58,89,0	warp	mvp76	1,1,pvp_n_5-4,55,118
+pvp_n_5-4,92,88,0	warp	mvp77	1,1,pvp_n_5-4,64,78
+pvp_n_5-4,67,78,0	warp	mvp78	1,1,pvp_n_5-4,95,88
+pvp_n_5-4,92,161,0	warp	mvp79	1,1,pvp_n_5-4,63,168
+pvp_n_5-4,67,168,0	warp	mvp80	1,1,pvp_n_5-4,95,161
+
+pvp_n_6-4,147,129,0	warp	mvp81	1,1,pvp_n_6-4,143,160
+pvp_n_6-4,143,156,0	warp	mvp82	1,1,pvp_n_6-4,147,125
+pvp_n_6-4,107,162,0	warp	mvp83	1,1,pvp_n_6-4,136,168
+pvp_n_6-4,132,168,0	warp	mvp84	1,1,pvp_n_6-4,104,162
+pvp_n_6-4,147,114,0	warp	mvp85	1,1,pvp_n_6-4,145,85
+pvp_n_6-4,145,89,0	warp	mvp86	1,1,pvp_n_6-4,147,120
+pvp_n_6-4,107,88,0	warp	mvp87	1,1,pvp_n_6-4,136,82
+pvp_n_6-4,132,82,0	warp	mvp88	1,1,pvp_n_6-4,104,88
+pvp_n_6-4,55,129,0	warp	mvp89	1,1,pvp_n_6-4,57,160
+pvp_n_6-4,57,156,0	warp	mvp90	1,1,pvp_n_6-4,58,125
+pvp_n_6-4,55,114,0	warp	mvp91	1,1,pvp_n_6-4,58,85
+pvp_n_6-4,58,89,0	warp	mvp92	1,1,pvp_n_6-4,55,118
+pvp_n_6-4,92,88,0	warp	mvp93	1,1,pvp_n_6-4,64,78
+pvp_n_6-4,67,78,0	warp	mvp94	1,1,pvp_n_6-4,95,88
+pvp_n_6-4,92,161,0	warp	mvp95	1,1,pvp_n_6-4,63,168
+pvp_n_6-4,67,168,0	warp	mvp96	1,1,pvp_n_6-4,95,161
+
+pvp_n_7-4,147,129,0	warp	mvp97	1,1,pvp_n_7-4,143,160
+pvp_n_7-4,143,156,0	warp	mvp98	1,1,pvp_n_7-4,147,125
+pvp_n_7-4,107,162,0	warp	mvp99	1,1,pvp_n_7-4,136,168
+pvp_n_7-4,132,168,0	warp	mvp100	1,1,pvp_n_7-4,104,162
+pvp_n_7-4,147,114,0	warp	mvp101	1,1,pvp_n_7-4,145,85
+pvp_n_7-4,145,89,0	warp	mvp102	1,1,pvp_n_7-4,147,120
+pvp_n_7-4,107,88,0	warp	mvp103	1,1,pvp_n_7-4,136,82
+pvp_n_7-4,132,82,0	warp	mvp104	1,1,pvp_n_7-4,104,88
+pvp_n_7-4,55,129,0	warp	mvp105	1,1,pvp_n_7-4,57,160
+pvp_n_7-4,57,156,0	warp	mvp106	1,1,pvp_n_7-4,58,125
+pvp_n_7-4,55,114,0	warp	mvp107	1,1,pvp_n_7-4,58,85
+pvp_n_7-4,58,89,0	warp	mvp108	1,1,pvp_n_7-4,55,118
+pvp_n_7-4,92,88,0	warp	mvp109	1,1,pvp_n_7-4,64,78
+pvp_n_7-4,67,78,0	warp	mvp110	1,1,pvp_n_7-4,95,88
+pvp_n_7-4,92,161,0	warp	mvp111	1,1,pvp_n_7-4,63,168
+pvp_n_7-4,67,168,0	warp	mvp112	1,1,pvp_n_7-4,95,161
+
+pvp_n_8-4,147,129,0	warp	mvp113	1,1,pvp_n_8-4,143,160
+pvp_n_8-4,143,156,0	warp	mvp114	1,1,pvp_n_8-4,147,125
+pvp_n_8-4,107,162,0	warp	mvp115	1,1,pvp_n_8-4,136,168
+pvp_n_8-4,132,168,0	warp	mvp116	1,1,pvp_n_8-4,104,162
+pvp_n_8-4,147,114,0	warp	mvp117	1,1,pvp_n_8-4,145,85
+pvp_n_8-4,145,89,0	warp	mvp118	1,1,pvp_n_8-4,147,120
+pvp_n_8-4,107,88,0	warp	mvp119	1,1,pvp_n_8-4,136,82
+pvp_n_8-4,132,82,0	warp	mvp120	1,1,pvp_n_8-4,104,88
+pvp_n_8-4,55,129,0	warp	mvp121	1,1,pvp_n_8-4,57,160
+pvp_n_8-4,57,156,0	warp	mvp122	1,1,pvp_n_8-4,58,125
+pvp_n_8-4,55,114,0	warp	mvp123	1,1,pvp_n_8-4,58,85
+pvp_n_8-4,58,89,0	warp	mvp124	1,1,pvp_n_8-4,55,118
+pvp_n_8-4,92,88,0	warp	mvp125	1,1,pvp_n_8-4,64,78
+pvp_n_8-4,67,78,0	warp	mvp126	1,1,pvp_n_8-4,95,88
+pvp_n_8-4,92,161,0	warp	mvp127	1,1,pvp_n_8-4,63,168
+pvp_n_8-4,67,168,0	warp	mvp128	1,1,pvp_n_8-4,95,161
+
+// Mapflags
+pvp_n_1-1	mapflag	pvp_nightmaredrop	on
+pvp_n_2-1	mapflag	pvp_nightmaredrop	off
+pvp_n_3-1	mapflag	pvp_nightmaredrop	off
+pvp_n_4-1	mapflag	pvp_nightmaredrop	off
+pvp_n_5-1	mapflag	pvp_nightmaredrop	off
+pvp_n_6-1	mapflag	pvp_nightmaredrop	off
+pvp_n_7-1	mapflag	pvp_nightmaredrop	off
+pvp_n_8-1	mapflag	pvp_nightmaredrop	off
+pvp_n_1-2	mapflag	pvp_nightmaredrop	off
+pvp_n_2-2	mapflag	pvp_nightmaredrop	off
+pvp_n_3-2	mapflag	pvp_nightmaredrop	off
+pvp_n_4-2	mapflag	pvp_nightmaredrop	off
+pvp_n_5-2	mapflag	pvp_nightmaredrop	off
+pvp_n_6-2	mapflag	pvp_nightmaredrop	off
+pvp_n_7-2	mapflag	pvp_nightmaredrop	off
+pvp_n_8-2	mapflag	pvp_nightmaredrop	off
+pvp_n_1-3	mapflag	pvp_nightmaredrop	off
+pvp_n_2-3	mapflag	pvp_nightmaredrop	off
+pvp_n_3-3	mapflag	pvp_nightmaredrop	off
+pvp_n_4-3	mapflag	pvp_nightmaredrop	off
+pvp_n_5-3	mapflag	pvp_nightmaredrop	off
+pvp_n_6-3	mapflag	pvp_nightmaredrop	off
+pvp_n_7-3	mapflag	pvp_nightmaredrop	off
+pvp_n_8-3	mapflag	pvp_nightmaredrop	off
+pvp_n_1-4	mapflag	pvp_nightmaredrop	off
+pvp_n_2-4	mapflag	pvp_nightmaredrop	off
+pvp_n_3-4	mapflag	pvp_nightmaredrop	off
+pvp_n_4-4	mapflag	pvp_nightmaredrop	off
+pvp_n_5-4	mapflag	pvp_nightmaredrop	off
+pvp_n_6-4	mapflag	pvp_nightmaredrop	off
+pvp_n_7-4	mapflag	pvp_nightmaredrop	off
+pvp_n_8-4	mapflag	pvp_nightmaredrop	off
+pvp_n_1-5	mapflag	pvp_nightmaredrop	off
+pvp_n_2-5	mapflag	pvp_nightmaredrop	off
+pvp_n_3-5	mapflag	pvp_nightmaredrop	off
+pvp_n_4-5	mapflag	pvp_nightmaredrop	off
+pvp_n_5-5	mapflag	pvp_nightmaredrop	off
+pvp_n_6-5	mapflag	pvp_nightmaredrop	off
+pvp_n_7-5	mapflag	pvp_nightmaredrop	off
+pvp_n_8-5	mapflag	pvp_nightmaredrop	off
+
+pvp_n_2-1	mapflag	pvp	off
+pvp_n_3-1	mapflag	pvp	off
+pvp_n_4-1	mapflag	pvp	off
+pvp_n_5-1	mapflag	pvp	off
+pvp_n_6-1	mapflag	pvp	off
+pvp_n_7-1	mapflag	pvp	off
+pvp_n_8-1	mapflag	pvp	off
+pvp_n_1-2	mapflag	pvp	off
+pvp_n_2-2	mapflag	pvp	off
+pvp_n_3-2	mapflag	pvp	off
+pvp_n_4-2	mapflag	pvp	off
+pvp_n_5-2	mapflag	pvp	off
+pvp_n_6-2	mapflag	pvp	off
+pvp_n_7-2	mapflag	pvp	off
+pvp_n_8-2	mapflag	pvp	off
+pvp_n_1-3	mapflag	pvp	off
+pvp_n_2-3	mapflag	pvp	off
+pvp_n_3-3	mapflag	pvp	off
+pvp_n_4-3	mapflag	pvp	off
+pvp_n_5-3	mapflag	pvp	off
+pvp_n_6-3	mapflag	pvp	off
+pvp_n_7-3	mapflag	pvp	off
+pvp_n_8-3	mapflag	pvp	off
+pvp_n_1-4	mapflag	pvp	off
+pvp_n_2-4	mapflag	pvp	off
+pvp_n_3-4	mapflag	pvp	off
+pvp_n_4-4	mapflag	pvp	off
+pvp_n_5-4	mapflag	pvp	off
+pvp_n_6-4	mapflag	pvp	off
+pvp_n_7-4	mapflag	pvp	off
+pvp_n_8-4	mapflag	pvp	off
+pvp_n_1-5	mapflag	pvp	off
+pvp_n_2-5	mapflag	pvp	off
+pvp_n_3-5	mapflag	pvp	off
+pvp_n_4-5	mapflag	pvp	off
+pvp_n_5-5	mapflag	pvp	off
+pvp_n_6-5	mapflag	pvp	off
+pvp_n_7-5	mapflag	pvp	off
+pvp_n_8-5	mapflag	pvp	off
+
+pvp_n_2-1	mapflag	nomemo
+pvp_n_3-1	mapflag	nomemo
+pvp_n_4-1	mapflag	nomemo
+pvp_n_5-1	mapflag	nomemo
+pvp_n_6-1	mapflag	nomemo
+pvp_n_7-1	mapflag	nomemo
+pvp_n_8-1	mapflag	nomemo
+pvp_n_1-2	mapflag	nomemo
+pvp_n_2-2	mapflag	nomemo
+pvp_n_3-2	mapflag	nomemo
+pvp_n_4-2	mapflag	nomemo
+pvp_n_5-2	mapflag	nomemo
+pvp_n_6-2	mapflag	nomemo
+pvp_n_7-2	mapflag	nomemo
+pvp_n_8-2	mapflag	nomemo
+pvp_n_1-3	mapflag	nomemo
+pvp_n_2-3	mapflag	nomemo
+pvp_n_3-3	mapflag	nomemo
+pvp_n_4-3	mapflag	nomemo
+pvp_n_5-3	mapflag	nomemo
+pvp_n_6-3	mapflag	nomemo
+pvp_n_7-3	mapflag	nomemo
+pvp_n_8-3	mapflag	nomemo
+pvp_n_1-4	mapflag	nomemo
+pvp_n_2-4	mapflag	nomemo
+pvp_n_3-4	mapflag	nomemo
+pvp_n_4-4	mapflag	nomemo
+pvp_n_5-4	mapflag	nomemo
+pvp_n_6-4	mapflag	nomemo
+pvp_n_7-4	mapflag	nomemo
+pvp_n_8-4	mapflag	nomemo
+pvp_n_1-5	mapflag	nomemo
+pvp_n_2-5	mapflag	nomemo
+pvp_n_3-5	mapflag	nomemo
+pvp_n_4-5	mapflag	nomemo
+pvp_n_5-5	mapflag	nomemo
+pvp_n_6-5	mapflag	nomemo
+pvp_n_7-5	mapflag	nomemo
+pvp_n_8-5	mapflag	nomemo
+
+pvp_n_2-1	mapflag	nosave	SavePoint
+pvp_n_3-1	mapflag	nosave	SavePoint
+pvp_n_4-1	mapflag	nosave	SavePoint
+pvp_n_5-1	mapflag	nosave	SavePoint
+pvp_n_6-1	mapflag	nosave	SavePoint
+pvp_n_7-1	mapflag	nosave	SavePoint
+pvp_n_8-1	mapflag	nosave	SavePoint
+pvp_n_1-2	mapflag	nosave	SavePoint
+pvp_n_2-2	mapflag	nosave	SavePoint
+pvp_n_3-2	mapflag	nosave	SavePoint
+pvp_n_4-2	mapflag	nosave	SavePoint
+pvp_n_5-2	mapflag	nosave	SavePoint
+pvp_n_6-2	mapflag	nosave	SavePoint
+pvp_n_7-2	mapflag	nosave	SavePoint
+pvp_n_8-2	mapflag	nosave	SavePoint
+pvp_n_1-3	mapflag	nosave	SavePoint
+pvp_n_2-3	mapflag	nosave	SavePoint
+pvp_n_3-3	mapflag	nosave	SavePoint
+pvp_n_4-3	mapflag	nosave	SavePoint
+pvp_n_5-3	mapflag	nosave	SavePoint
+pvp_n_6-3	mapflag	nosave	SavePoint
+pvp_n_7-3	mapflag	nosave	SavePoint
+pvp_n_8-3	mapflag	nosave	SavePoint
+pvp_n_1-4	mapflag	nosave	SavePoint
+pvp_n_2-4	mapflag	nosave	SavePoint
+pvp_n_3-4	mapflag	nosave	SavePoint
+pvp_n_4-4	mapflag	nosave	SavePoint
+pvp_n_5-4	mapflag	nosave	SavePoint
+pvp_n_6-4	mapflag	nosave	SavePoint
+pvp_n_7-4	mapflag	nosave	SavePoint
+pvp_n_8-4	mapflag	nosave	SavePoint
+pvp_n_1-5	mapflag	nosave	SavePoint
+pvp_n_2-5	mapflag	nosave	SavePoint
+pvp_n_3-5	mapflag	nosave	SavePoint
+pvp_n_4-5	mapflag	nosave	SavePoint
+pvp_n_5-5	mapflag	nosave	SavePoint
+pvp_n_6-5	mapflag	nosave	SavePoint
+pvp_n_7-5	mapflag	nosave	SavePoint
+pvp_n_8-5	mapflag	nosave	SavePoint
+
+pvp_n_2-1	mapflag	noteleport
+pvp_n_3-1	mapflag	noteleport
+pvp_n_4-1	mapflag	noteleport
+pvp_n_5-1	mapflag	noteleport
+pvp_n_6-1	mapflag	noteleport
+pvp_n_7-1	mapflag	noteleport
+pvp_n_8-1	mapflag	noteleport
+pvp_n_1-2	mapflag	noteleport
+pvp_n_2-2	mapflag	noteleport
+pvp_n_3-2	mapflag	noteleport
+pvp_n_4-2	mapflag	noteleport
+pvp_n_5-2	mapflag	noteleport
+pvp_n_6-2	mapflag	noteleport
+pvp_n_7-2	mapflag	noteleport
+pvp_n_8-2	mapflag	noteleport
+pvp_n_1-3	mapflag	noteleport
+pvp_n_2-3	mapflag	noteleport
+pvp_n_3-3	mapflag	noteleport
+pvp_n_4-3	mapflag	noteleport
+pvp_n_5-3	mapflag	noteleport
+pvp_n_6-3	mapflag	noteleport
+pvp_n_7-3	mapflag	noteleport
+pvp_n_8-3	mapflag	noteleport
+pvp_n_1-4	mapflag	noteleport
+pvp_n_2-4	mapflag	noteleport
+pvp_n_3-4	mapflag	noteleport
+pvp_n_4-4	mapflag	noteleport
+pvp_n_5-4	mapflag	noteleport
+pvp_n_6-4	mapflag	noteleport
+pvp_n_7-4	mapflag	noteleport
+pvp_n_8-4	mapflag	noteleport
+pvp_n_1-5	mapflag	noteleport
+pvp_n_2-5	mapflag	noteleport
+pvp_n_3-5	mapflag	noteleport
+pvp_n_4-5	mapflag	noteleport
+pvp_n_5-5	mapflag	noteleport
+pvp_n_6-5	mapflag	noteleport
+pvp_n_7-5	mapflag	noteleport
+pvp_n_8-5	mapflag	noteleport
+
+pvp_n_2-1	mapflag	nodynamicnpc
+pvp_n_3-1	mapflag	nodynamicnpc
+pvp_n_4-1	mapflag	nodynamicnpc
+pvp_n_5-1	mapflag	nodynamicnpc
+pvp_n_6-1	mapflag	nodynamicnpc
+pvp_n_7-1	mapflag	nodynamicnpc
+pvp_n_8-1	mapflag	nodynamicnpc
+pvp_n_1-2	mapflag	nodynamicnpc
+pvp_n_2-2	mapflag	nodynamicnpc
+pvp_n_3-2	mapflag	nodynamicnpc
+pvp_n_4-2	mapflag	nodynamicnpc
+pvp_n_5-2	mapflag	nodynamicnpc
+pvp_n_6-2	mapflag	nodynamicnpc
+pvp_n_7-2	mapflag	nodynamicnpc
+pvp_n_8-2	mapflag	nodynamicnpc
+pvp_n_1-3	mapflag	nodynamicnpc
+pvp_n_2-3	mapflag	nodynamicnpc
+pvp_n_3-3	mapflag	nodynamicnpc
+pvp_n_4-3	mapflag	nodynamicnpc
+pvp_n_5-3	mapflag	nodynamicnpc
+pvp_n_6-3	mapflag	nodynamicnpc
+pvp_n_7-3	mapflag	nodynamicnpc
+pvp_n_8-3	mapflag	nodynamicnpc
+pvp_n_1-4	mapflag	nodynamicnpc
+pvp_n_2-4	mapflag	nodynamicnpc
+pvp_n_3-4	mapflag	nodynamicnpc
+pvp_n_4-4	mapflag	nodynamicnpc
+pvp_n_5-4	mapflag	nodynamicnpc
+pvp_n_6-4	mapflag	nodynamicnpc
+pvp_n_7-4	mapflag	nodynamicnpc
+pvp_n_8-4	mapflag	nodynamicnpc
+pvp_n_1-5	mapflag	nodynamicnpc
+pvp_n_2-5	mapflag	nodynamicnpc
+pvp_n_3-5	mapflag	nodynamicnpc
+pvp_n_4-5	mapflag	nodynamicnpc
+pvp_n_5-5	mapflag	nodynamicnpc
+pvp_n_6-5	mapflag	nodynamicnpc
+pvp_n_7-5	mapflag	nodynamicnpc
+pvp_n_8-5	mapflag	nodynamicnpc
+
+//Duplicates
+prontera,167,189,3	duplicate(Atendente_VIP)	Atendente VIP#01	4_F_02
+//prontera,167,189,3	duplicate(Atendente_VIP)	Atendente VIP#02	4_F_02
+//prontera,167,189,3	duplicate(Atendente_VIP)	Atendente VIP#03	4_F_02
